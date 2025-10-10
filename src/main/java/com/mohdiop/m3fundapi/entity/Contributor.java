@@ -1,0 +1,48 @@
+package com.mohdiop.m3fundapi.entity;
+
+import com.mohdiop.m3fundapi.entity.enums.CampaignType;
+import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import java.util.Set;
+
+@EqualsAndHashCode(callSuper = true)
+@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "contributors")
+public class Contributor extends User {
+
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "localization_id", nullable = false)
+    private Localization localization;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "contributor_project_preferences",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "domain_preference", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Set<ProjectDomain> projectDomains;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "contributor_campaign_preferences",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "campaign_preference", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Set<CampaignType> campaignTypes;
+}
