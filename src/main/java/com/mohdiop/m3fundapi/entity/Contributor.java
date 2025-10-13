@@ -3,16 +3,14 @@ package com.mohdiop.m3fundapi.entity;
 import com.mohdiop.m3fundapi.entity.enums.CampaignType;
 import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "contributors")
@@ -45,4 +43,7 @@ public class Contributor extends User {
     @Column(name = "campaign_preference", nullable = false)
     @Enumerated(EnumType.STRING)
     private Set<CampaignType> campaignTypes;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "contributor")
+    private Set<Discussion> discussions;
 }

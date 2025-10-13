@@ -2,14 +2,14 @@ package com.mohdiop.m3fundapi.entity;
 
 import com.mohdiop.m3fundapi.entity.enums.ProjectOwnerType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "project_owners")
@@ -58,4 +58,10 @@ public class ProjectOwner extends User {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "bank_statement_id")
     private File bankStatement;
+
+    @OneToMany(mappedBy = "projectOwner", cascade = CascadeType.ALL)
+    private Set<Campaign> campaigns;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "projectOwner")
+    private Set<Discussion> discussions;
 }

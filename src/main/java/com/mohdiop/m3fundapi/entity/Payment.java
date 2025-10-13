@@ -1,7 +1,7 @@
 package com.mohdiop.m3fundapi.entity;
 
-import com.mohdiop.m3fundapi.entity.enums.ActionType;
-import com.mohdiop.m3fundapi.entity.enums.EntityName;
+import com.mohdiop.m3fundapi.entity.enums.PaymentState;
+import com.mohdiop.m3fundapi.entity.enums.PaymentType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,27 +10,29 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "actions")
-public class Action {
+@NoArgsConstructor
+@Table(name = "payments")
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private ActionType actionType;
+    private String transactionId;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private EntityName entityName;
+    private PaymentType paymentType;
 
     @Column(nullable = false)
-    private LocalDateTime actionDate;
+    private LocalDateTime carriedOutOn;
 
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "author_id")
-    private Administrator author;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentState state;
+
+    @Column(nullable = false)
+    private double amount;
 }

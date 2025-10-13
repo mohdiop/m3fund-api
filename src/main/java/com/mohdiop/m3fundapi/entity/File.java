@@ -3,12 +3,11 @@ package com.mohdiop.m3fundapi.entity;
 import com.mohdiop.m3fundapi.entity.enums.FileExtension;
 import com.mohdiop.m3fundapi.entity.enums.FileType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "files")
@@ -16,7 +15,7 @@ public class File {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(nullable = false)
     private String name;
