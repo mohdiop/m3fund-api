@@ -4,6 +4,7 @@ import com.mohdiop.m3fundapi.entity.enums.UserRole;
 import com.mohdiop.m3fundapi.entity.enums.UserState;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.Set;
 @Setter
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
+@SuperBuilder
 public abstract class User {
 
     @Id
