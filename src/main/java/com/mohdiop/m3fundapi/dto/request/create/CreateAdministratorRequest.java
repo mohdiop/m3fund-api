@@ -26,7 +26,7 @@ public record CreateAdministratorRequest(
         @NotBlank(message = "Le numéro de téléphone est obligatoire.")
         @Pattern(
                 regexp = "^\\+[1-9]\\d{1,3}[- ]?\\d{6,14}$",
-                message = "Le numéro de téléphone doit inclure l'indicatif international (ex: +33 612345678)."
+                message = "Le numéro de téléphone doit inclure l'indicatif international (ex: +223 71234567)."
         )
         String phone,
 

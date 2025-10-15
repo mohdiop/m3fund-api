@@ -1,8 +1,10 @@
 package com.mohdiop.m3fundapi.entity;
 
+import com.mohdiop.m3fundapi.dto.response.IndividualProjectOwnerResponse;
 import com.mohdiop.m3fundapi.entity.enums.ProjectOwnerType;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
 
@@ -13,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "project_owners")
+@SuperBuilder
 public class ProjectOwner extends User {
 
     private String firstName;
@@ -64,4 +67,22 @@ public class ProjectOwner extends User {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "projectOwner")
     private Set<Discussion> discussions;
+
+    public IndividualProjectOwnerResponse toIndividualResponse() {
+        return new IndividualProjectOwnerResponse(
+                getId(),
+                firstName,
+                lastName,
+                getEmail(),
+                getPhone(),
+                address,
+                annualIncome,
+                (profilePicture != null) ? profilePicture.getUrl() : null,
+                biometricCard.getUrl(),
+                residenceCertificate.getUrl(),
+                (bankStatement != null) ? bankStatement.getUrl() : null,
+                getState(),
+                getUserCreatedAt()
+        );
+    }
 }

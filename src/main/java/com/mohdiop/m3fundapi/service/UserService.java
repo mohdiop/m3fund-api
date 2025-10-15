@@ -1,7 +1,9 @@
 package com.mohdiop.m3fundapi.service;
 
 import com.mohdiop.m3fundapi.entity.Administrator;
+import com.mohdiop.m3fundapi.entity.ProjectOwner;
 import com.mohdiop.m3fundapi.entity.User;
+import com.mohdiop.m3fundapi.entity.enums.ProjectOwnerType;
 import com.mohdiop.m3fundapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,11 @@ public class UserService {
                 );
         if (user instanceof Administrator) {
             return ((Administrator) user).toResponse();
+        }
+        if (user instanceof ProjectOwner) {
+            if (((ProjectOwner) user).getType() == ProjectOwnerType.INDIVIDUAL) {
+                return ((ProjectOwner) user).toIndividualResponse();
+            }
         }
         return null;
     }
