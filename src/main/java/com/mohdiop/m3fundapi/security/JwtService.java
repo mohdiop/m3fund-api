@@ -47,7 +47,7 @@ public class JwtService {
     }
 
     public String generateAccessToken(Long userId, Set<UserRole> userRoles) {
-        long accessTokenValidityMs = 5L * 60L * 60L * 1000L;
+        long accessTokenValidityMs = 9L * 60L * 60L * 1000L;
         return generateToken(userId, TokenType.ACCESS_TOKEN, accessTokenValidityMs, userRoles);
     }
 

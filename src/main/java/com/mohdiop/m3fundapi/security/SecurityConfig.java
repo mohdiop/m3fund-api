@@ -37,21 +37,10 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
                     auth
-                            .requestMatchers(
-                                    "/api/v1/auth/**",
-                                    "/api/v1/establishments/**"
-                            )
+                            .requestMatchers("/auth/**")
                             .permitAll()
-                            .requestMatchers("/api/v1/users/me")
-                            .hasAnyRole("ADMIN", "SPONSOR", "ORGANIZATION", "STUDENT")
-                            .requestMatchers("/api/v1/sponsors/**")
-                            .hasRole("SPONSOR")
-                            .requestMatchers("/api/v1/organizations/**")
-                            .hasRole("ORGANIZATION")
-                            .requestMatchers("/api/v1/students/**")
-                            .hasRole("STUDENT")
-                            .requestMatchers("/api/v1/admins/**")
-                            .hasRole("ADMIN")
+                            .requestMatchers("/admins/**")
+                            .hasAnyRole("SUPER_ADMIN", "VALIDATIONS_ADMIN", "USERS_ADMIN", "PAYMENTS_ADMIN")
                             .anyRequest()
                             .authenticated();
                 })

@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "M3Fund",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

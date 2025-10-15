@@ -31,6 +31,6 @@ public class SuperAdministratorInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        administratorService.initializeSuperAdministrator(new CreateAdministratorRequest(adminFirstName, adminLastName, adminEmail, adminPhone, adminPassword, new HashSet<>(List.of(UserRole.SUPER_ADMIN))));
+        administratorService.initializeSuperAdministrator(new CreateAdministratorRequest(adminFirstName, adminLastName, adminEmail, adminPhone, adminPassword, new HashSet<>(List.of(UserRole.ROLE_SUPER_ADMIN))));
     }
 }
