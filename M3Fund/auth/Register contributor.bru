@@ -1,0 +1,38 @@
+meta {
+  name: Register contributor
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/register/contributors
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "firstName": "Abdoul Ibrahima", 
+    "lastName": "Samaké", 
+    "email": "abdoul03@gmail.com",
+    "phone": "+2234090409O49",
+    "password": "Test@1234",
+    "localization": {
+      "town": "Bamako",
+      "region": "Koulikoro", 
+      "street": "Niarela",
+      "longitude": "20.209",
+      "latitude": "24.39"
+    },
+    "projectDomainPrefs": [
+      "AGRICULTURE"
+    ],
+    "campaignTypePrefs": [
+      "INVESTMENT"
+    ]
+  }
+}
+
+settings {
+  encodeUrl: true
+}

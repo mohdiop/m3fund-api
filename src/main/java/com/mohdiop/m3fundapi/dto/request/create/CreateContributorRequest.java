@@ -1,0 +1,85 @@
+package com.mohdiop.m3fundapi.dto.request.create;
+
+import com.mohdiop.m3fundapi.entity.Contributor;
+import com.mohdiop.m3fundapi.entity.Localization;
+import com.mohdiop.m3fundapi.entity.enums.CampaignType;
+import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
+import com.mohdiop.m3fundapi.entity.enums.UserRole;
+import com.mohdiop.m3fundapi.entity.enums.UserState;
+import jakarta.validation.constraints.*;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public record CreateContributorRequest(
+
+        @NotBlank(message = "Le prénom est obligatoire.")
+        @Size(min = 2, max = 50, message = "Le prénom doit comporter entre 2 et 50 caractères.")
+        String firstName,
+
+        @NotBlank(message = "Le nom est obligatoire.")
+        @Size(min = 2, max = 50, message = "Le nom doit comporter entre 2 et 50 caractères.")
+        String lastName,
+
+        @NotNull(message = "La localisation est obligatoire.")
+        Localization localization,
+
+        @NotNull(message = "Les préférences de domaines de projet de l'utilisateur sont obligatoires.")
+        @Size(min = 1, message = "L'utilisateur doit avoir au moins une préférence de domaine.")
+        Set<ProjectDomain> projectDomainPrefs,
+
+        @NotNull(message = "Les préférences de type de campagne de l'utilisateur sont obligatoires.")
+        @Size(min = 1, message = "L'utilisateur doit avoir au moins une préférence de type de campagne.")
+        Set<CampaignType> campaignTypePrefs,
+
+        @NotBlank(message = "L'adresse e-mail est obligatoire.")
+        @Email(message = "Le format de l'adresse e-mail est invalide.")
+        @Size(max = 100, message = "L'adresse e-mail ne doit pas dépasser 100 caractères.")
+        String email,
+
+        @NotBlank(message = "Le numéro de téléphone est obligatoire.")
+        @Pattern(
+                regexp = "^\\+[1-9]\\d{1,3}[- ]?\\d{6,14}$",
+                message = "Le numéro de téléphone doit inclure l'indicatif international (ex: +223 71234567)."
+        )
+        String phone,
+
+        @NotBlank(message = "Le mot de passe est obligatoire.")
+        @Size(min = 8, max = 64, message = "Le mot de passe doit contenir entre 8 et 64 caractères.")
+        @Pattern(
+                regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&]).+$",
+                message = "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial."
+        )
+        String password
+) {
+
+    public Contributor toContributor() {
+        return Contributor
+                .builder()
+                .id(null)
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .phone(phone)
+                .password(BCrypt.hashpw(password, BCrypt.gensalt()))
+                .projectDomains(projectDomainPrefs)
+                .campaignTypes(campaignTypePrefs)
+                .state(UserState.ACTIVE)
+                .userRoles(new HashSet<>(List.of(UserRole.ROLE_CONTRIBUTOR)))
+                .userCreatedAt(LocalDateTime.now())
+                .localization(
+                        Localization.builder()
+                                .id(null)
+                                .region(localization.getRegion())
+                                .town(localization.getTown())
+                                .street(localization.getStreet())
+                                .longitude(localization().getLongitude())
+                                .latitude(localization.getLatitude())
+                                .build()
+                )
+                .build();
+    }
+}

@@ -2,6 +2,7 @@ package com.mohdiop.m3fundapi.entity.enums;
 
 public enum UserRole {
     ROLE_PROJECT_OWNER,
+    ROLE_CONTRIBUTOR,
     ROLE_DONATOR,
     ROLE_INVESTOR,
     ROLE_VOLUNTEER,

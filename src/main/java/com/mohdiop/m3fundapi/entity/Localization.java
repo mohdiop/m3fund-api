@@ -1,10 +1,8 @@
 package com.mohdiop.m3fundapi.entity;
 
+import com.mohdiop.m3fundapi.dto.response.LocalizationResponse;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
@@ -12,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "localizations")
+@Builder
 public class Localization {
 
     @Id
@@ -32,4 +31,15 @@ public class Localization {
 
     @Column(nullable = false)
     private double latitude;
+
+    public LocalizationResponse toResponse() {
+        return new LocalizationResponse(
+                id,
+                town,
+                region,
+                street,
+                longitude,
+                latitude
+        );
+    }
 }
