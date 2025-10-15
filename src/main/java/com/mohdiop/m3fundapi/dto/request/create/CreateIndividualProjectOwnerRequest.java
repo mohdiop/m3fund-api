@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 
-public record CreateProjectOwnerRequest(
+public record CreateIndividualProjectOwnerRequest(
         @NotBlank(message = "Le prénom est obligatoire.")
         @Size(min = 2, max = 50, message = "Le prénom doit comporter entre 2 et 50 caractères.")
         String firstName,

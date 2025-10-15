@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = FileContentTypeValidator.class)
 @Documented
 public @interface FileContentType {
-    String[] allowed(); // types MIME autorisés
+    String[] allowed();
     String message() default "Type de fichier non autorisé.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

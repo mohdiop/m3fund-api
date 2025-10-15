@@ -1,6 +1,8 @@
 package com.mohdiop.m3fundapi.service;
 
-import com.mohdiop.m3fundapi.dto.request.create.CreateProjectOwnerRequest;
+import com.mohdiop.m3fundapi.dto.request.create.CreateAssociationProjectOwner;
+import com.mohdiop.m3fundapi.dto.request.create.CreateIndividualProjectOwnerRequest;
+import com.mohdiop.m3fundapi.dto.response.AssociationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.IndividualProjectOwnerResponse;
 import com.mohdiop.m3fundapi.entity.ProjectOwner;
 import com.mohdiop.m3fundapi.entity.enums.FileType;
@@ -26,59 +28,59 @@ public class ProjectOwnerService {
     }
 
     public IndividualProjectOwnerResponse createIndividualProjectOwner(
-            CreateProjectOwnerRequest createProjectOwnerRequest
+            CreateIndividualProjectOwnerRequest createIndividualProjectOwnerRequest
     ) throws BadRequestException {
-        if (userRepository.findByEmail(createProjectOwnerRequest.email()).isPresent()) {
+        if (userRepository.findByEmail(createIndividualProjectOwnerRequest.email()).isPresent()) {
             throw new BadRequestException("Email invalide!");
         }
-        if (userRepository.findByPhone(createProjectOwnerRequest.phone()).isPresent()) {
+        if (userRepository.findByPhone(createIndividualProjectOwnerRequest.phone()).isPresent()) {
             throw new BadRequestException("Numéro de téléphone invalide!");
         }
-        ProjectOwner projectOwner = createProjectOwnerRequest.toIndividualProjectOwner();
-        if (createProjectOwnerRequest.profilePicture() != null) {
+        ProjectOwner projectOwner = createIndividualProjectOwnerRequest.toIndividualProjectOwner();
+        if (createIndividualProjectOwnerRequest.profilePicture() != null) {
             projectOwner.setProfilePicture(
                     uploadService.uploadFile(
-                            createProjectOwnerRequest.profilePicture(),
+                            createIndividualProjectOwnerRequest.profilePicture(),
                             UUID.randomUUID().toString(),
                             FileType.PICTURE,
                             uploadService.getFileExtension(
-                                    createProjectOwnerRequest.profilePicture()
+                                    createIndividualProjectOwnerRequest.profilePicture()
                             )
                     )
             );
         }
-        if (createProjectOwnerRequest.biometricCard() != null) {
+        if (createIndividualProjectOwnerRequest.biometricCard() != null) {
             projectOwner.setBiometricCard(
                     uploadService.uploadFile(
-                            createProjectOwnerRequest.biometricCard(),
+                            createIndividualProjectOwnerRequest.biometricCard(),
                             UUID.randomUUID().toString(),
                             FileType.BIOMETRIC_CARD,
                             uploadService.getFileExtension(
-                                    createProjectOwnerRequest.biometricCard()
+                                    createIndividualProjectOwnerRequest.biometricCard()
                             )
                     )
             );
         }
-        if (createProjectOwnerRequest.bankStatement() != null) {
+        if (createIndividualProjectOwnerRequest.bankStatement() != null) {
             projectOwner.setBankStatement(
                     uploadService.uploadFile(
-                            createProjectOwnerRequest.bankStatement(),
+                            createIndividualProjectOwnerRequest.bankStatement(),
                             UUID.randomUUID().toString(),
                             FileType.BANK_STATEMENT,
                             uploadService.getFileExtension(
-                                    createProjectOwnerRequest.bankStatement()
+                                    createIndividualProjectOwnerRequest.bankStatement()
                             )
                     )
             );
         }
-        if (createProjectOwnerRequest.residenceCertificate() != null) {
+        if (createIndividualProjectOwnerRequest.residenceCertificate() != null) {
             projectOwner.setResidenceCertificate(
                     uploadService.uploadFile(
-                            createProjectOwnerRequest.residenceCertificate(),
+                            createIndividualProjectOwnerRequest.residenceCertificate(),
                             UUID.randomUUID().toString(),
                             FileType.RESIDENCE,
                             uploadService.getFileExtension(
-                                    createProjectOwnerRequest.residenceCertificate()
+                                    createIndividualProjectOwnerRequest.residenceCertificate()
                             )
                     )
             );
@@ -86,5 +88,54 @@ public class ProjectOwnerService {
         return projectOwnerRepository.save(
                 projectOwner
         ).toIndividualResponse();
+    }
+
+    public AssociationProjectOwnerResponse createAssociationProjectOwner(
+            CreateAssociationProjectOwner createAssociationProjectOwner
+    ) throws BadRequestException {
+        if (userRepository.findByEmail(createAssociationProjectOwner.email()).isPresent()) {
+            throw new BadRequestException("Email invalide!");
+        }
+        if (userRepository.findByPhone(createAssociationProjectOwner.phone()).isPresent()) {
+            throw new BadRequestException("Numéro de téléphone invalide!");
+        }
+        ProjectOwner projectOwner = createAssociationProjectOwner.toAssociationProjectOwner();
+        if (createAssociationProjectOwner.logo() != null) {
+            projectOwner.setProfilePicture(
+                    uploadService.uploadFile(
+                            createAssociationProjectOwner.logo(),
+                            UUID.randomUUID().toString(),
+                            FileType.LOGO,
+                            uploadService.getFileExtension(
+                                    createAssociationProjectOwner.logo()
+                            )
+                    )
+            );
+        }
+        if (createAssociationProjectOwner.bankStatement() != null) {
+            projectOwner.setBankStatement(
+                    uploadService.uploadFile(
+                            createAssociationProjectOwner.bankStatement(),
+                            UUID.randomUUID().toString(),
+                            FileType.BANK_STATEMENT,
+                            uploadService.getFileExtension(
+                                    createAssociationProjectOwner.bankStatement()
+                            )
+                    )
+            );
+        }
+        if (createAssociationProjectOwner.associationStatus() != null) {
+            projectOwner.setAssociationStatus(
+                    uploadService.uploadFile(
+                            createAssociationProjectOwner.associationStatus(),
+                            UUID.randomUUID().toString(),
+                            FileType.ASSOCIATION_STATUS,
+                            uploadService.getFileExtension(
+                                    createAssociationProjectOwner.associationStatus()
+                            )
+                    )
+            );
+        }
+        return projectOwnerRepository.save(projectOwner).toAssociationResponse();
     }
 }

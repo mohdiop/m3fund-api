@@ -31,6 +31,9 @@ public class UserService {
             if (((ProjectOwner) user).getType() == ProjectOwnerType.INDIVIDUAL) {
                 return ((ProjectOwner) user).toIndividualResponse();
             }
+            if (((ProjectOwner) user).getType() == ProjectOwnerType.ASSOCIATION) {
+                return ((ProjectOwner) user).toAssociationResponse();
+            }
         }
         return null;
     }

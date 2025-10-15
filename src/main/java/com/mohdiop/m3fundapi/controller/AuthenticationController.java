@@ -1,8 +1,10 @@
 package com.mohdiop.m3fundapi.controller;
 
 import com.mohdiop.m3fundapi.dto.AuthenticationRequest;
+import com.mohdiop.m3fundapi.dto.request.create.CreateAssociationProjectOwner;
 import com.mohdiop.m3fundapi.dto.request.create.CreateContributorRequest;
-import com.mohdiop.m3fundapi.dto.request.create.CreateProjectOwnerRequest;
+import com.mohdiop.m3fundapi.dto.request.create.CreateIndividualProjectOwnerRequest;
+import com.mohdiop.m3fundapi.dto.response.AssociationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.ContributorResponse;
 import com.mohdiop.m3fundapi.dto.response.IndividualProjectOwnerResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
@@ -49,10 +51,20 @@ public class AuthenticationController {
 
     @PostMapping("/register/project-owners/individual")
     public ResponseEntity<IndividualProjectOwnerResponse> registerIndividualProjectOwner(
-            @Valid @ModelAttribute CreateProjectOwnerRequest createProjectOwnerRequest
+            @Valid @ModelAttribute CreateIndividualProjectOwnerRequest createIndividualProjectOwnerRequest
     ) throws BadRequestException {
         return new ResponseEntity<>(
-                projectOwnerService.createIndividualProjectOwner(createProjectOwnerRequest),
+                projectOwnerService.createIndividualProjectOwner(createIndividualProjectOwnerRequest),
+                HttpStatus.CREATED
+        );
+    }
+
+    @PostMapping("/register/project-owners/association")
+    public ResponseEntity<AssociationProjectOwnerResponse> registerAssociationProjectOwner(
+            @Valid @ModelAttribute CreateAssociationProjectOwner createAssociationProjectOwner
+    ) throws BadRequestException {
+        return new ResponseEntity<>(
+                projectOwnerService.createAssociationProjectOwner(createAssociationProjectOwner),
                 HttpStatus.CREATED
         );
     }
