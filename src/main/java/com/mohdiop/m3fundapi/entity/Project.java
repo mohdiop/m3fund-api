@@ -60,9 +60,6 @@ public class Project {
     private boolean isValidated;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Reward> rewards;
-
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Campaign> campaigns;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

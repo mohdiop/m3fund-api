@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -28,11 +29,9 @@ public class Campaign {
     private ProjectOwner projectOwner;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "campaign")
-    @Transient
     private CapitalPurchase capitalPurchase;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "campaign")
-    @Transient
     private Gift gift;
 
     @Column(nullable = false)
@@ -44,7 +43,7 @@ public class Campaign {
     @Column(nullable = false)
     private double targetBudget;
 
-    @Column(columnDefinition = "DOUBLE CHECK (shareOffered >= 0 AND shareOffered <= 100)")
+    @Column(name = "share_offered", columnDefinition = "DOUBLE CHECK (share_offered >= 0 AND share_offered <= 100)")
     private double shareOffered;
 
     @Column(nullable = false)
@@ -54,4 +53,7 @@ public class Campaign {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private CampaignState state;
+
+    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Reward> rewards;
 }

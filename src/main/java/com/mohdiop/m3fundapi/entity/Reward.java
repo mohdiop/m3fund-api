@@ -36,6 +36,6 @@ public class Reward {
     private Double unlockAmount;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
+    @JoinColumn(name = "campaign_id", nullable = false)
+    private Campaign campaign;
 }

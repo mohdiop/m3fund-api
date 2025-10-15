@@ -23,7 +23,7 @@ public class CapitalPurchase {
     @Column(nullable = false)
     private LocalDateTime date;
 
-    @Column(columnDefinition = "DOUBLE CHECK (prix >= 0 AND prix <= 100)")
+    @Column(name = "share_acquired", columnDefinition = "DOUBLE CHECK (share_acquired >= 0 AND share_acquired <= 100)")
     private double shareAcquired;
 
     @OneToOne(fetch = FetchType.LAZY)
