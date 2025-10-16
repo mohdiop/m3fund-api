@@ -5,21 +5,21 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/auth/register/project-owners/individual
+  url: {{baseUrl}}/auth/register/project-owners/organization
   body: multipartForm
   auth: inherit
 }
 
 body:multipart-form {
-  firstName: Mohamed
-  lastName: Diop
-  email: mohameddiop1951@gmail.com
-  phone: +22370909090
-  annualIncome: 2400000
+  entityName: Orange
+  email: mohmoh@gmail.com
+  phone: +22370909093
+  annualIncome: 2400000.00
   password: Test@1234
-  biometricCard: @file(C:\Users\kalandew28\Downloads\ChatGPT Image 10 oct. 2025, 10_18_55.png)
-  residenceCertificate: @file(C:\Users\kalandew28\Downloads\ChatGPT Image 9 oct. 2025, 15_14_18.png)
+  rccm: @file(C:\Users\moham\Downloads\Fiche détaillée trisomie 21.pdf)
+  bankStatement: @file(C:\Users\moham\Downloads\Fiche détaillée trisomie 21.pdf)
   address: Bamako, Mali
+  shareCapital: 3292904093.00
 }
 
 settings {
