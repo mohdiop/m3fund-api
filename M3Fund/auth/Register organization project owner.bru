@@ -1,0 +1,27 @@
+meta {
+  name: Register organization project owner
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/auth/register/project-owners/organization
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  entityName: Orange
+  email: mohmoh@gmail.com
+  phone: +22370909093
+  annualIncome: 2400000.00
+  password: Test@1234
+  rccm: @file(C:\Users\moham\Downloads\Fiche détaillée trisomie 21.pdf)
+  bankStatement: @file(C:\Users\moham\Downloads\Fiche détaillée trisomie 21.pdf)
+  address: Bamako, Mali
+  shareCapital: 3292904093.00
+}
+
+settings {
+  encodeUrl: true
+}

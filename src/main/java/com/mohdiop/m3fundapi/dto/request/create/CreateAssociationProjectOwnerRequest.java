@@ -16,14 +16,11 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 
-public record CreateIndividualProjectOwnerRequest(
-        @NotBlank(message = "Le prénom est obligatoire.")
-        @Size(min = 2, max = 50, message = "Le prénom doit comporter entre 2 et 50 caractères.")
-        String firstName,
+public record CreateAssociationProjectOwnerRequest(
 
-        @NotBlank(message = "Le nom est obligatoire.")
-        @Size(min = 2, max = 50, message = "Le nom doit comporter entre 2 et 50 caractères.")
-        String lastName,
+        @NotBlank(message = "Le nom de l'entité est obligatoire.")
+        @Size(min = 2, max = 50, message = "Le nom de l'entité doit comporter entre 2 et 50 caractères.")
+        String entityName,
 
         @NotBlank(message = "L'adresse e-mail est obligatoire.")
         @Email(message = "Le format de l'adresse e-mail est invalide.")
@@ -54,37 +51,47 @@ public record CreateIndividualProjectOwnerRequest(
         @Digits(integer = 12, fraction = 2, message = "Le revenu annuel doit être un nombre valide avec au maximum 2 décimales.")
         Double annualIncome,
 
-        @FileNotEmptyIfPresent(message = "Le fichier de la photo de profil ne peut pas être vide.")
-        @FileContentTypeIfPresent(allowed = {"image/jpeg", "image/png"}, message = "La photo de profil doit être au format JPG ou PNG.")
-        MultipartFile profilePicture,
+        @NotNull(message = "Le capital social est obligatoire.")
+        @DecimalMin(value = "0.0", inclusive = false, message = "Le capital social doit être supérieur à 0.")
+        @Digits(integer = 12, fraction = 2, message = "Le capital social doit être un nombre valide avec au maximum 2 décimales.")
+        Double shareCapital,
 
-        @NotNull(message = "La carte biométrique est obligatoire.")
-        @FileNotEmpty(message = "Le fichier de la carte biométrique ne peut pas être vide.")
-        @FileContentType(allowed = {"image/jpeg", "image/png", "application/pdf"}, message = "La carte biométrique doit être une image ou un PDF.")
-        MultipartFile biometricCard,
+        @FileNotEmptyIfPresent(message = "Le fichier du logo ne peut pas être vide.")
+        @FileContentTypeIfPresent(
+                allowed = {"image/jpeg", "image/png"},
+                message = "Le logo doit être au format JPG ou PNG."
+        )
+        MultipartFile logo,
 
-        @NotNull(message = "Le certificat de résidence est obligatoire.")
-        @FileNotEmpty(message = "Le fichier du certificat de résidence ne peut pas être vide.")
-        @FileContentType(allowed = {"application/pdf", "image/jpeg", "image/png"}, message = "Le certificat de résidence doit être une image ou un PDF.")
-        MultipartFile residenceCertificate,
+        @NotNull(message = "Le statut de l'association est obligatoire.")
+        @FileNotEmpty(message = "Le fichier du statut de l'association ne peut pas être vide.")
+        @FileContentType(
+                allowed = {"image/jpeg", "image/png", "application/pdf"},
+                message = "Le statut de l'association doit être une image ou un PDF."
+        )
+        MultipartFile associationStatus,
 
-        @FileNotEmptyIfPresent(message = "Le fichier du relevé bancaire ne peut pas être vide.")
-        @FileContentTypeIfPresent(allowed = {"application/pdf"}, message = "Le relevé bancaire doit être au format PDF.")
+        @NotNull(message = "Le relevé bancaire est obligatoire.")
+        @FileNotEmpty(message = "Le fichier du relevé bancaire ne peut pas être vide.")
+        @FileContentType(
+                allowed = {"application/pdf"},
+                message = "Le relevé bancaire doit être au format PDF."
+        )
         MultipartFile bankStatement
 ) {
 
-    public ProjectOwner toIndividualProjectOwner() {
+    public ProjectOwner toAssociationProjectOwner() {
         return ProjectOwner.builder()
                 .id(null)
-                .firstName(firstName)
-                .lastName(lastName)
+                .entityName(entityName)
                 .email(email)
                 .phone(phone)
                 .password(BCrypt.hashpw(password, BCrypt.gensalt()))
                 .address(address)
                 .annualIncome(annualIncome)
+                .shareCapital(shareCapital)
                 .userRoles(new HashSet<>(List.of(UserRole.ROLE_PROJECT_OWNER)))
-                .type(ProjectOwnerType.INDIVIDUAL)
+                .type(ProjectOwnerType.ASSOCIATION)
                 .state(UserState.INACTIVE)
                 .userCreatedAt(LocalDateTime.now())
                 .build();

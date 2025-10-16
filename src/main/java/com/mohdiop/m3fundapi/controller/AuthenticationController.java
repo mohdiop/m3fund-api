@@ -1,12 +1,14 @@
 package com.mohdiop.m3fundapi.controller;
 
 import com.mohdiop.m3fundapi.dto.AuthenticationRequest;
-import com.mohdiop.m3fundapi.dto.request.create.CreateAssociationProjectOwner;
+import com.mohdiop.m3fundapi.dto.request.create.CreateAssociationProjectOwnerRequest;
 import com.mohdiop.m3fundapi.dto.request.create.CreateContributorRequest;
 import com.mohdiop.m3fundapi.dto.request.create.CreateIndividualProjectOwnerRequest;
+import com.mohdiop.m3fundapi.dto.request.create.CreateOrganizationProjectOwnerRequest;
 import com.mohdiop.m3fundapi.dto.response.AssociationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.ContributorResponse;
 import com.mohdiop.m3fundapi.dto.response.IndividualProjectOwnerResponse;
+import com.mohdiop.m3fundapi.dto.response.OrganizationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
 import com.mohdiop.m3fundapi.service.ContributorService;
 import com.mohdiop.m3fundapi.service.ProjectOwnerService;
@@ -61,10 +63,20 @@ public class AuthenticationController {
 
     @PostMapping("/register/project-owners/association")
     public ResponseEntity<AssociationProjectOwnerResponse> registerAssociationProjectOwner(
-            @Valid @ModelAttribute CreateAssociationProjectOwner createAssociationProjectOwner
+            @Valid @ModelAttribute CreateAssociationProjectOwnerRequest createAssociationProjectOwnerRequest
     ) throws BadRequestException {
         return new ResponseEntity<>(
-                projectOwnerService.createAssociationProjectOwner(createAssociationProjectOwner),
+                projectOwnerService.createAssociationProjectOwner(createAssociationProjectOwnerRequest),
+                HttpStatus.CREATED
+        );
+    }
+
+    @PostMapping("/register/project-owners/organization")
+    public ResponseEntity<OrganizationProjectOwnerResponse> registerOrganizationProjectOwner(
+            @Valid @ModelAttribute CreateOrganizationProjectOwnerRequest createOrganizationProjectOwnerRequest
+            ) throws BadRequestException {
+        return new ResponseEntity<>(
+                projectOwnerService.createOrganization(createOrganizationProjectOwnerRequest),
                 HttpStatus.CREATED
         );
     }
