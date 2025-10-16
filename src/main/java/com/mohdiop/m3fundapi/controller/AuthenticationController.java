@@ -74,10 +74,20 @@ public class AuthenticationController {
     @PostMapping("/register/project-owners/organization")
     public ResponseEntity<OrganizationProjectOwnerResponse> registerOrganizationProjectOwner(
             @Valid @ModelAttribute CreateOrganizationProjectOwnerRequest createOrganizationProjectOwnerRequest
-            ) throws BadRequestException {
+    ) throws BadRequestException {
         return new ResponseEntity<>(
                 projectOwnerService.createOrganization(createOrganizationProjectOwnerRequest),
                 HttpStatus.CREATED
+        );
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthenticationService.TokenPairResponse> refreshToken(
+            @RequestBody String refreshToken
+    ) {
+        return new ResponseEntity<>(
+                authenticationService.refresh(refreshToken),
+                HttpStatus.OK
         );
     }
 }
