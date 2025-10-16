@@ -150,35 +150,97 @@ public class UploadService {
     }
 
     private String getDotExtensionType(FileExtension fileExtension) {
-        switch (fileExtension) {
-            case JPG -> {
-                return ".jpg";
-            }
-            case PNG -> {
-                return ".png";
-            }
-            case PDF -> {
-                return ".pdf";
-            }
-        }
-        throw new RuntimeException("Un problème est survenu de notre côté, veuillez réessayer plus tard.");
+        return switch (fileExtension) {
+            case JPG -> ".jpg";
+            case JPEG -> ".jpeg";
+            case PNG -> ".png";
+            case GIF -> ".gif";
+            case BMP -> ".bmp";
+            case WEBP -> ".webp";
+            case MP4 -> ".mp4";
+            case MOV -> ".mov";
+            case AVI -> ".avi";
+            case MKV -> ".mkv";
+            case WEBM -> ".webm";
+            case PDF -> ".pdf";
+            case DOC -> ".doc";
+            case DOCX -> ".docx";
+            case XLS -> ".xls";
+            case XLSX -> ".xlsx";
+            case PPT -> ".ppt";
+            case PPTX -> ".pptx";
+            case TXT -> ".txt";
+        };
     }
 
     public FileExtension getFileExtension(MultipartFile file) {
         Tika tika = new Tika();
         String detectedType;
+
         try {
             detectedType = tika.detect(file.getInputStream());
         } catch (IOException e) {
             throw new RuntimeException("Un problème est survenu de notre côté, veuillez réessayer plus tard.");
         }
-        if ("application/pdf".equals(detectedType)) {
-            return FileExtension.PDF;
-        } else if ("image/jpeg".equals(detectedType)) {
-            return FileExtension.JPG;
-        } else {
-            return FileExtension.PNG;
+
+        switch (detectedType) {
+            case "image/jpeg" -> {
+                return FileExtension.JPG;
+            }
+            case "image/png" -> {
+                return FileExtension.PNG;
+            }
+            case "image/gif" -> {
+                return FileExtension.GIF;
+            }
+            case "image/bmp" -> {
+                return FileExtension.BMP;
+            }
+            case "image/webp" -> {
+                return FileExtension.WEBP;
+            }
+            case "video/mp4" -> {
+                return FileExtension.MP4;
+            }
+            case "video/quicktime" -> {
+                return FileExtension.MOV;
+            }
+            case "video/x-msvideo" -> {
+                return FileExtension.AVI;
+            }
+            case "video/x-matroska" -> {
+                return FileExtension.MKV;
+            }
+            case "video/webm" -> {
+                return FileExtension.WEBM;
+            }
+            case "application/pdf" -> {
+                return FileExtension.PDF;
+            }
+            case "application/msword" -> {
+                return FileExtension.DOC;
+            }
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> {
+                return FileExtension.DOCX;
+            }
+            case "application/vnd.ms-excel" -> {
+                return FileExtension.XLS;
+            }
+            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" -> {
+                return FileExtension.XLSX;
+            }
+            case "application/vnd.ms-powerpoint" -> {
+                return FileExtension.PPT;
+            }
+            case "application/vnd.openxmlformats-officedocument.presentationml.presentation" -> {
+                return FileExtension.PPTX;
+            }
+            case "text/plain" -> {
+                return FileExtension.TXT;
+            }
+            default -> throw new RuntimeException("Type de fichier non pris en charge : " + detectedType);
         }
     }
+
 }
 

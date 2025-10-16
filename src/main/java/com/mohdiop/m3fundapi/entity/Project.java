@@ -1,12 +1,12 @@
 package com.mohdiop.m3fundapi.entity;
 
+import com.mohdiop.m3fundapi.dto.response.ProjectResponse;
 import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -15,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "projects")
+@Builder
 public class Project {
 
     @Id
@@ -40,6 +41,12 @@ public class Project {
     @Column(nullable = false)
     private String websiteLink;
 
+    @Column(nullable = false)
+    private LocalDateTime launchedAt;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinTable(
             name = "project_images",
@@ -64,5 +71,26 @@ public class Project {
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Comment> comments;
+
+    public ProjectResponse toResponse() {
+        var imagesUrl = new HashSet<String>();
+        for (var image : images) {
+            imagesUrl.add(image.getUrl());
+        }
+        return new ProjectResponse(
+                id,
+                name,
+                description,
+                resume,
+                objective,
+                domain,
+                websiteLink,
+                imagesUrl,
+                video.getUrl(),
+                businessPlan.getUrl(),
+                launchedAt,
+                createdAt
+        );
+    }
 }
 

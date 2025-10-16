@@ -5,9 +5,13 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/refresh
-  body: none
+  url: {{baseUrl}}/auth/refresh
+  body: json
   auth: inherit
+}
+
+body:json {
+  eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidHlwZSI6IlJFRlJFU0hfVE9LRU4iLCJyb2xlcyI6WyJST0xFX1NVUEVSX0FETUlOIl0sImlhdCI6MTc2MDYxMTU4MSwiZXhwIjoxNzYzMjAzNTgxfQ.JpR6pHYIDDFBVZEPvDzt_rg-f5j3Oq31k087W9LkUFw
 }
 
 settings {
