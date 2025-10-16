@@ -2,6 +2,7 @@ package com.mohdiop.m3fundapi.entity;
 
 import com.mohdiop.m3fundapi.dto.response.AssociationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.IndividualProjectOwnerResponse;
+import com.mohdiop.m3fundapi.dto.response.OrganizationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.entity.enums.ProjectOwnerType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -82,6 +83,7 @@ public class ProjectOwner extends User {
                 biometricCard.getUrl(),
                 residenceCertificate.getUrl(),
                 (bankStatement != null) ? bankStatement.getUrl() : null,
+                type,
                 getState(),
                 getUserCreatedAt()
         );
@@ -99,6 +101,24 @@ public class ProjectOwner extends User {
                 (profilePicture != null) ? profilePicture.getUrl() : null,
                 associationStatus.getUrl(),
                 bankStatement.getUrl(),
+                type,
+                getState(),
+                getUserCreatedAt()
+        );
+    }
+
+    public OrganizationProjectOwnerResponse toOrganizationResponse() {
+        return new OrganizationProjectOwnerResponse(
+                getId(),
+                entityName,
+                getEmail(),
+                getPhone(),
+                address,
+                annualIncome,
+                (profilePicture != null) ? profilePicture.getUrl() : null,
+                rccm.getUrl(),
+                bankStatement.getUrl(),
+                type,
                 getState(),
                 getUserCreatedAt()
         );

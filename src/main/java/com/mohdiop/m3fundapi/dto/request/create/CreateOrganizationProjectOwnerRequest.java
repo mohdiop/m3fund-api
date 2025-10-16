@@ -16,8 +16,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 
-public record CreateAssociationProjectOwner(
-
+public record CreateOrganizationProjectOwnerRequest(
         @NotBlank(message = "Le nom de l'entité est obligatoire.")
         @Size(min = 2, max = 50, message = "Le nom de l'entité doit comporter entre 2 et 50 caractères.")
         String entityName,
@@ -63,13 +62,13 @@ public record CreateAssociationProjectOwner(
         )
         MultipartFile logo,
 
-        @NotNull(message = "Le statut de l'association est obligatoire.")
-        @FileNotEmpty(message = "Le fichier du statut de l'association ne peut pas être vide.")
+        @NotNull(message = "Le rccm de l'entreprise est obligatoire.")
+        @FileNotEmpty(message = "Le fichier du rccm de l'entreprise ne peut pas être vide.")
         @FileContentType(
                 allowed = {"image/jpeg", "image/png", "application/pdf"},
-                message = "Le statut de l'association doit être une image ou un PDF."
+                message = "Le rccm de l'entreprise doit être une image ou un PDF."
         )
-        MultipartFile associationStatus,
+        MultipartFile rccm,
 
         @NotNull(message = "Le relevé bancaire est obligatoire.")
         @FileNotEmpty(message = "Le fichier du relevé bancaire ne peut pas être vide.")
@@ -80,7 +79,7 @@ public record CreateAssociationProjectOwner(
         MultipartFile bankStatement
 ) {
 
-    public ProjectOwner toAssociationProjectOwner() {
+    public ProjectOwner toOrganizationProjectOwner() {
         return ProjectOwner.builder()
                 .id(null)
                 .entityName(entityName)
@@ -90,10 +89,10 @@ public record CreateAssociationProjectOwner(
                 .address(address)
                 .annualIncome(annualIncome)
                 .shareCapital(shareCapital)
-                .userRoles(new HashSet<>(List.of(UserRole.ROLE_PROJECT_OWNER)))
-                .type(ProjectOwnerType.ASSOCIATION)
-                .state(UserState.ACTIVE)
+                .state(UserState.INACTIVE)
                 .userCreatedAt(LocalDateTime.now())
+                .userRoles(new HashSet<>(List.of(UserRole.ROLE_CONTRIBUTOR)))
+                .type(ProjectOwnerType.ORGANIZATION)
                 .build();
     }
 }
