@@ -22,11 +22,13 @@ public class ProjectOwnerService {
     private final UserRepository userRepository;
 
     private final UploadService uploadService;
+    private final EmailService emailService;
 
-    public ProjectOwnerService(ProjectOwnerRepository projectOwnerRepository, UserRepository userRepository, UploadService uploadService) {
+    public ProjectOwnerService(ProjectOwnerRepository projectOwnerRepository, UserRepository userRepository, UploadService uploadService, EmailService emailService) {
         this.projectOwnerRepository = projectOwnerRepository;
         this.userRepository = userRepository;
         this.uploadService = uploadService;
+        this.emailService = emailService;
     }
 
     public IndividualProjectOwnerResponse createIndividualProjectOwner(
@@ -87,9 +89,9 @@ public class ProjectOwnerService {
                     )
             );
         }
-        return projectOwnerRepository.save(
-                projectOwner
-        ).toIndividualResponse();
+        ProjectOwner projectOwnerToReturn = projectOwnerRepository.save(projectOwner);
+        sendPendingCreationEmail(projectOwnerToReturn.getEmail());
+        return projectOwnerToReturn.toIndividualResponse();
     }
 
     public AssociationProjectOwnerResponse createAssociationProjectOwner(
@@ -138,7 +140,9 @@ public class ProjectOwnerService {
                     )
             );
         }
-        return projectOwnerRepository.save(projectOwner).toAssociationResponse();
+        ProjectOwner projectOwnerToReturn = projectOwnerRepository.save(projectOwner);
+        sendPendingCreationEmail(projectOwnerToReturn.getEmail());
+        return projectOwnerToReturn.toAssociationResponse();
     }
 
     public OrganizationProjectOwnerResponse createOrganization(
@@ -187,6 +191,22 @@ public class ProjectOwnerService {
                     )
             );
         }
-        return projectOwnerRepository.save(projectOwner).toOrganizationResponse();
+        ProjectOwner projectOwnerToReturn = projectOwnerRepository.save(projectOwner);
+        sendPendingCreationEmail(projectOwnerToReturn.getEmail());
+        return projectOwnerToReturn.toOrganizationResponse();
+    }
+
+    public void sendPendingCreationEmail(
+            String recipientEmail
+    ) {
+        emailService.sendEmail(
+                recipientEmail,
+                "Création de compte",
+                """
+                        Bonjour, nous procédons à la vérification de vos informations pour la création de votre compte.\
+                        Un mail vous sera envoyé prochainement sous 48h pour vous informer de l'état.
+                        Merci de bien vouloir patienter, l'équipe de M3Fund.
+                        """
+        );
     }
 }

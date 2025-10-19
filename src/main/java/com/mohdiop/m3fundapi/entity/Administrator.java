@@ -17,10 +17,8 @@ import java.util.Set;
 @SuperBuilder
 public class Administrator extends User {
 
-    @Column(nullable = false)
     private String firstName;
 
-    @Column(nullable = false)
     private String lastName;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "author")
