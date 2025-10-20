@@ -1,5 +1,6 @@
 package com.mohdiop.m3fundapi.entity;
 
+import com.mohdiop.m3fundapi.dto.response.OwnerProjectResponse;
 import com.mohdiop.m3fundapi.dto.response.ProjectResponse;
 import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
 import jakarta.persistence.*;
@@ -72,6 +73,10 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Comment> comments;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private ProjectOwner owner;
+
     public ProjectResponse toResponse() {
         var imagesUrl = new HashSet<String>();
         for (var image : images) {
@@ -89,7 +94,31 @@ public class Project {
                 video.getUrl(),
                 businessPlan.getUrl(),
                 launchedAt,
-                createdAt
+                createdAt,
+                isValidated
+        );
+    }
+
+    public OwnerProjectResponse toOwnerProjectResponse() {
+        var imagesUrl = new HashSet<String>();
+        for (var image : images) {
+            imagesUrl.add(image.getUrl());
+        }
+        return new OwnerProjectResponse(
+                id,
+                name,
+                description,
+                resume,
+                objective,
+                domain,
+                websiteLink,
+                imagesUrl,
+                video.getUrl(),
+                businessPlan.getUrl(),
+                launchedAt,
+                createdAt,
+                isValidated,
+                owner.toSimpleOwnerResponse()
         );
     }
 }

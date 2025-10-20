@@ -3,6 +3,7 @@ package com.mohdiop.m3fundapi.entity;
 import com.mohdiop.m3fundapi.dto.response.AssociationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.IndividualProjectOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.OrganizationProjectOwnerResponse;
+import com.mohdiop.m3fundapi.dto.response.SimpleOwnerResponse;
 import com.mohdiop.m3fundapi.entity.enums.ProjectOwnerType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -70,6 +71,9 @@ public class ProjectOwner extends User {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "projectOwner")
     private Set<Discussion> discussions;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "owner")
+    private Set<Project> projects;
+
     public IndividualProjectOwnerResponse toIndividualResponse() {
         return new IndividualProjectOwnerResponse(
                 getId(),
@@ -121,6 +125,20 @@ public class ProjectOwner extends User {
                 type,
                 getState(),
                 getUserCreatedAt()
+        );
+    }
+
+    public SimpleOwnerResponse toSimpleOwnerResponse() {
+        String name;
+        if (type == ProjectOwnerType.INDIVIDUAL) {
+            name = firstName + " " + lastName;
+        } else {
+            name = entityName;
+        }
+        return new SimpleOwnerResponse(
+                getId(),
+                name,
+                (profilePicture != null) ? profilePicture.getUrl() : null
         );
     }
 }

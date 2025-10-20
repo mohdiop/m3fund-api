@@ -5,7 +5,7 @@ import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-public record ProjectResponse(
+public record OwnerProjectResponse(
         Long id,
         String name,
         String description,
@@ -18,6 +18,7 @@ public record ProjectResponse(
         String businessPlanUrl,
         LocalDateTime launchedAt,
         LocalDateTime createdAt,
-        Boolean isValidated
+        Boolean isValidated,
+        SimpleOwnerResponse owner
 ) {
 }
