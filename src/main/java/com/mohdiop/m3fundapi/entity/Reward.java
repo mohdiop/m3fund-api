@@ -5,6 +5,8 @@ import com.mohdiop.m3fundapi.entity.enums.RewardType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -33,6 +35,9 @@ public class Reward {
 
     @Column(nullable = false)
     private Double unlockAmount;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "reward")
+    private Set<RewardWinning> rewardWinnings;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "campaign_id", nullable = false)

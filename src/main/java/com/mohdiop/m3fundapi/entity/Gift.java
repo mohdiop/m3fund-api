@@ -1,10 +1,10 @@
 package com.mohdiop.m3fundapi.entity;
 
+import com.mohdiop.m3fundapi.dto.response.GiftResponse;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -12,6 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "gifts")
+@Builder
 public class Gift {
 
     @Id
@@ -25,10 +26,20 @@ public class Gift {
     @JoinColumn(nullable = false, name = "payment_id")
     private Payment payment;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private Set<RewardWinning> rewardWinnings;
-
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "campaign_id")
     private Campaign campaign;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "contributor_id")
+    private Contributor contributor;
+
+    public GiftResponse toResponse() {
+        return new GiftResponse(
+                id,
+                date,
+                payment.toResponse(),
+                campaign.getId()
+        );
+    }
 }

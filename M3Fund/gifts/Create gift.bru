@@ -1,0 +1,27 @@
+meta {
+  name: Create gift
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/projects/campaigns/1/gifts
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "payment": {
+      "transactionId": "12345678901234567892",
+      "type": "ORANGE_MONEY",
+      "state": "SUCCESS",
+      "amount": 20000.00
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
