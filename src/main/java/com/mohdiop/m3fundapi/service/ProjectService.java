@@ -10,6 +10,7 @@ import com.mohdiop.m3fundapi.entity.enums.FileType;
 import com.mohdiop.m3fundapi.repository.ProjectOwnerRepository;
 import com.mohdiop.m3fundapi.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -78,6 +79,20 @@ public class ProjectService {
             );
         }
         return projectRepository.save(project).toResponse();
+    }
+
+    public OwnerProjectResponse validateProject(
+            Long projectId
+    ) throws BadRequestException {
+        Project projectToValidate = projectRepository.findById(projectId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Projet introuvable!")
+                );
+        if (projectToValidate.isValidated()) {
+            throw new BadRequestException("Projet déjà validé.");
+        }
+        projectToValidate.setValidated(true);
+        return projectRepository.save(projectToValidate).toOwnerProjectResponse();
     }
 
     public List<OwnerProjectResponse> getAllProjects() {

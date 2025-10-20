@@ -6,12 +6,11 @@ import com.mohdiop.m3fundapi.dto.response.ProjectResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
 import com.mohdiop.m3fundapi.service.ProjectService;
 import jakarta.validation.Valid;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/projects")
@@ -36,6 +35,16 @@ public class ProjectController {
                         createProjectRequest
                 ),
                 HttpStatus.CREATED
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
+    @PostMapping("/{projectId}/validate")
+    public ResponseEntity<OwnerProjectResponse> validateProject(
+            @PathVariable Long projectId
+    ) throws BadRequestException {
+        return ResponseEntity.ok(
+                projectService.validateProject(projectId)
         );
     }
 }

@@ -44,7 +44,7 @@ public record CreateProjectRequest(
         LocalDateTime launchedAt,
 
         @NotEmpty(message = "Au moins une image est obligatoire.")
-        @Size(min = 1, max = 10, message = "Vous devez fournir entre 1 et 10 images.")
+        @Size(min = 1, max = 6, message = "Vous devez fournir entre 1 et 6 images.")
         @ValidFileList(
                 allowed = {"image/jpeg", "image/png"},
                 message = "Toutes les images doivent être au format JPG ou PNG."

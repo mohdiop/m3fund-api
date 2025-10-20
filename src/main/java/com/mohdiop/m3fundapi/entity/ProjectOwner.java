@@ -89,7 +89,8 @@ public class ProjectOwner extends User {
                 (bankStatement != null) ? bankStatement.getUrl() : null,
                 type,
                 getState(),
-                getUserCreatedAt()
+                getUserCreatedAt(),
+                getUserRoles()
         );
     }
 
@@ -107,7 +108,8 @@ public class ProjectOwner extends User {
                 bankStatement.getUrl(),
                 type,
                 getState(),
-                getUserCreatedAt()
+                getUserCreatedAt(),
+                getUserRoles()
         );
     }
 
@@ -124,7 +126,8 @@ public class ProjectOwner extends User {
                 bankStatement.getUrl(),
                 type,
                 getState(),
-                getUserCreatedAt()
+                getUserCreatedAt(),
+                getUserRoles()
         );
     }
 

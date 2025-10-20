@@ -91,7 +91,7 @@ public record CreateOrganizationProjectOwnerRequest(
                 .shareCapital(shareCapital)
                 .state(UserState.INACTIVE)
                 .userCreatedAt(LocalDateTime.now())
-                .userRoles(new HashSet<>(List.of(UserRole.ROLE_CONTRIBUTOR)))
+                .userRoles(new HashSet<>(List.of(UserRole.ROLE_PROJECT_OWNER)))
                 .type(ProjectOwnerType.ORGANIZATION)
                 .build();
     }
