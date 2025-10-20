@@ -1,4 +1,4 @@
-package com.mohdiop.m3fundapi.dto;
+package com.mohdiop.m3fundapi.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 

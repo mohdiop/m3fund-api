@@ -1,6 +1,6 @@
 package com.mohdiop.m3fundapi.controller;
 
-import com.mohdiop.m3fundapi.dto.AuthenticationRequest;
+import com.mohdiop.m3fundapi.dto.request.AuthenticationRequest;
 import com.mohdiop.m3fundapi.dto.request.create.CreateAssociationProjectOwnerRequest;
 import com.mohdiop.m3fundapi.dto.request.create.CreateContributorRequest;
 import com.mohdiop.m3fundapi.dto.request.create.CreateIndividualProjectOwnerRequest;

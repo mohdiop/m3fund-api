@@ -1,6 +1,6 @@
 package com.mohdiop.m3fundapi.service;
 
-import com.mohdiop.m3fundapi.dto.AuthenticationRequest;
+import com.mohdiop.m3fundapi.dto.request.AuthenticationRequest;
 import com.mohdiop.m3fundapi.entity.RefreshToken;
 import com.mohdiop.m3fundapi.entity.User;
 import com.mohdiop.m3fundapi.entity.enums.UserState;

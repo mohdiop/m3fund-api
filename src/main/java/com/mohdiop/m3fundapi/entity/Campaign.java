@@ -1,5 +1,6 @@
 package com.mohdiop.m3fundapi.entity;
 
+import com.mohdiop.m3fundapi.dto.response.CampaignResponse;
 import com.mohdiop.m3fundapi.entity.enums.CampaignState;
 import com.mohdiop.m3fundapi.entity.enums.CampaignType;
 import jakarta.persistence.*;
@@ -14,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "campaigns")
+@Builder
 public class Campaign {
 
     @Id
@@ -40,8 +42,9 @@ public class Campaign {
     @Column(nullable = false)
     private LocalDateTime endAt;
 
-    @Column(nullable = false)
     private double targetBudget;
+
+    private long targetVolunteer;
 
     @Column(name = "share_offered", columnDefinition = "DOUBLE CHECK (share_offered >= 0 AND share_offered <= 100)")
     private double shareOffered;
@@ -56,4 +59,20 @@ public class Campaign {
 
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Reward> rewards;
+
+    public CampaignResponse toResponse() {
+        return new CampaignResponse(
+                id,
+                project.toResponse(),
+                projectOwner.toSimpleOwnerResponse(),
+                launchedAt,
+                endAt,
+                targetBudget,
+                targetVolunteer,
+                shareOffered,
+                type,
+                state,
+                rewards.stream().map(Reward::toResponse).toList()
+        );
+    }
 }

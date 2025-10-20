@@ -1,11 +1,9 @@
 package com.mohdiop.m3fundapi.entity;
 
+import com.mohdiop.m3fundapi.dto.response.RewardResponse;
 import com.mohdiop.m3fundapi.entity.enums.RewardType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
@@ -13,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "rewards")
+@Builder
 public class Reward {
 
     @Id
@@ -30,7 +29,7 @@ public class Reward {
     private RewardType type;
 
     @Column(nullable = false)
-    private int quantity;
+    private long quantity;
 
     @Column(nullable = false)
     private Double unlockAmount;
@@ -38,4 +37,15 @@ public class Reward {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "campaign_id", nullable = false)
     private Campaign campaign;
+
+    public RewardResponse toResponse() {
+        return new RewardResponse(
+                id,
+                name,
+                description,
+                type,
+                quantity,
+                unlockAmount
+        );
+    }
 }
