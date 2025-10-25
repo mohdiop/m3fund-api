@@ -17,6 +17,8 @@ public record CampaignResponse(
         double shareOffered,
         CampaignType type,
         CampaignState state,
-        List<RewardResponse> rewards
+        List<RewardResponse> rewards,
+        double currentFund,
+        int numberOfVolunteer
 ) {
 }

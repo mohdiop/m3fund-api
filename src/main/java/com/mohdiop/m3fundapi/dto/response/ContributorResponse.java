@@ -2,6 +2,7 @@ package com.mohdiop.m3fundapi.dto.response;
 
 import com.mohdiop.m3fundapi.entity.enums.CampaignType;
 import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
+import com.mohdiop.m3fundapi.entity.enums.UserRole;
 import com.mohdiop.m3fundapi.entity.enums.UserState;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ public record ContributorResponse(
         Set<ProjectDomain> projectDomainPrefs,
         Set<CampaignType> campaignTypePrefs,
         UserState state,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Set<UserRole> roles
 ) {
 }

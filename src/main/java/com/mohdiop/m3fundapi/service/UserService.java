@@ -1,11 +1,14 @@
 package com.mohdiop.m3fundapi.service;
 
+import com.mohdiop.m3fundapi.dto.request.CheckForEmailAndPhoneValidityRequest;
 import com.mohdiop.m3fundapi.entity.Administrator;
+import com.mohdiop.m3fundapi.entity.Contributor;
 import com.mohdiop.m3fundapi.entity.ProjectOwner;
 import com.mohdiop.m3fundapi.entity.User;
 import com.mohdiop.m3fundapi.entity.enums.ProjectOwnerType;
 import com.mohdiop.m3fundapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,6 +39,22 @@ public class UserService {
             }
             return ((ProjectOwner) user).toOrganizationResponse();
         }
+        if (user instanceof Contributor) {
+            return ((Contributor) user).toResponse();
+        }
         return null;
+    }
+
+    public void checkForEmailAndPhoneValidity(
+            CheckForEmailAndPhoneValidityRequest checkRequest
+    ) throws BadRequestException {
+        if(checkRequest.email() != null) {
+            if (userRepository.findByEmail(checkRequest.email()).isPresent()) {
+                throw new BadRequestException("Email indisponible, choisissez un autre.");
+            }
+        }
+        if (userRepository.findByPhone(checkRequest.phone()).isPresent()) {
+            throw new BadRequestException("Numéro de téléphone indisponible, choisissez un autre.");
+        }
     }
 }

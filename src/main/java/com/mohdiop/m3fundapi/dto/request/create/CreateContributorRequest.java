@@ -25,17 +25,14 @@ public record CreateContributorRequest(
         String lastName,
 
         @NotNull(message = "La localisation est obligatoire.")
-        Localization localization,
+        CreateLocalizationRequest localization,
 
         @NotNull(message = "Les préférences de domaines de projet de l'utilisateur sont obligatoires.")
-        @Size(min = 1, message = "L'utilisateur doit avoir au moins une préférence de domaine.")
         Set<ProjectDomain> projectDomainPrefs,
 
         @NotNull(message = "Les préférences de type de campagne de l'utilisateur sont obligatoires.")
-        @Size(min = 1, message = "L'utilisateur doit avoir au moins une préférence de type de campagne.")
         Set<CampaignType> campaignTypePrefs,
 
-        @NotBlank(message = "L'adresse e-mail est obligatoire.")
         @Email(message = "Le format de l'adresse e-mail est invalide.")
         @Size(max = 100, message = "L'adresse e-mail ne doit pas dépasser 100 caractères.")
         String email,
@@ -71,14 +68,7 @@ public record CreateContributorRequest(
                 .userRoles(new HashSet<>(List.of(UserRole.ROLE_CONTRIBUTOR)))
                 .userCreatedAt(LocalDateTime.now())
                 .localization(
-                        Localization.builder()
-                                .id(null)
-                                .region(localization.getRegion())
-                                .town(localization.getTown())
-                                .street(localization.getStreet())
-                                .longitude(localization().getLongitude())
-                                .latitude(localization.getLatitude())
-                                .build()
+                        localization.toLocalization()
                 )
                 .build();
     }

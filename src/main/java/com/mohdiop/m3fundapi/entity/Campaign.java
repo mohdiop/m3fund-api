@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Set;
 
 @Entity
@@ -33,9 +34,6 @@ public class Campaign {
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "campaign")
     private CapitalPurchase capitalPurchase;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "campaign")
-    private Gift gift;
-
     @Column(nullable = false)
     private LocalDateTime launchedAt;
 
@@ -60,7 +58,26 @@ public class Campaign {
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Reward> rewards;
 
+    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Gift> gifts;
+
+    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Volunteer> volunteers;
+
+    public int getCurrentVolunteerNumber() {
+        if(type != CampaignType.VOLUNTEERING) {
+            return 0;
+        }
+        return volunteers.size();
+    }
+
     public CampaignResponse toResponse() {
+        double currentFund = 0D;
+        if(type == CampaignType.DONATION && gifts != null) {
+            for(var gift: gifts) {
+                currentFund += gift.getPayment().getAmount();
+            }
+        }
         return new CampaignResponse(
                 id,
                 project.toResponse(),
@@ -72,7 +89,9 @@ public class Campaign {
                 shareOffered,
                 type,
                 state,
-                rewards.stream().map(Reward::toResponse).toList()
+                (rewards != null) ? rewards.stream().map(Reward::toResponse).toList() : Collections.emptyList(),
+                currentFund,
+                getCurrentVolunteerNumber()
         );
     }
 }

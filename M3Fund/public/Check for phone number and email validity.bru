@@ -1,0 +1,22 @@
+meta {
+  name: Check for phone number and email validity
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/public/valid-email-and-phone
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "phone": "70313104"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

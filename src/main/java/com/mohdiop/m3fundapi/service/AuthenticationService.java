@@ -3,6 +3,7 @@ package com.mohdiop.m3fundapi.service;
 import com.mohdiop.m3fundapi.dto.request.AuthenticationRequest;
 import com.mohdiop.m3fundapi.entity.RefreshToken;
 import com.mohdiop.m3fundapi.entity.User;
+import com.mohdiop.m3fundapi.entity.enums.UserRole;
 import com.mohdiop.m3fundapi.entity.enums.UserState;
 import com.mohdiop.m3fundapi.repository.RefreshTokenRepository;
 import com.mohdiop.m3fundapi.repository.UserRepository;
@@ -40,6 +41,27 @@ public class AuthenticationService {
     public TokenPairResponse authenticate(AuthenticationRequest authenticationRequest) {
         User userToAuthenticate = userRepository.findByEmail(authenticationRequest.email())
                 .orElseThrow(() -> new BadCredentialsException("Email ou mot de passe incorrect."));
+
+        switch (authenticationRequest.platform()) {
+            case MOBILE_CONTRIBUTOR -> {
+                if(!userToAuthenticate.getUserRoles().contains(UserRole.ROLE_CONTRIBUTOR)) {
+                    throw new BadCredentialsException("Email ou mot de passe incorrect.");
+                }
+            }
+            case WEB_ADMIN -> {
+                if(!userToAuthenticate.getUserRoles().contains(UserRole.ROLE_SUPER_ADMIN)
+                || !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_PAYMENTS_ADMIN)
+                || !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_USERS_ADMIN)
+                || !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_VALIDATIONS_ADMIN)) {
+                    throw new BadCredentialsException("Email ou mot de passe incorrect.");
+                }
+            }
+            case WEB_PROJECT_OWNER -> {
+                if(!userToAuthenticate.getUserRoles().contains(UserRole.ROLE_PROJECT_OWNER)) {
+                    throw new BadCredentialsException("Email ou mot de passe incorrect.");
+                }
+            }
+        }
 
         if (BCrypt.checkpw(authenticationRequest.password(), userToAuthenticate.getPassword())) {
             if (userToAuthenticate.getState() == UserState.SUSPENDED) {

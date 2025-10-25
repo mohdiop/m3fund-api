@@ -1,0 +1,23 @@
+meta {
+  name: test
+  type: http
+  seq: 9
+}
+
+get {
+  url: https://nominatim.openstreetmap.org/reverse?lat=12.601333&lon=-7.922303&format=json&adressDetails=3
+  body: none
+  auth: inherit
+}
+
+params:query {
+  lat: 12.601333
+  lon: -7.922303
+  format: json
+  adressDetails: 3
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

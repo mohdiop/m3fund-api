@@ -18,6 +18,9 @@ public class Localization {
     private Long id;
 
     @Column(nullable = false)
+    private String country;
+
+    @Column(nullable = false)
     private String town;
 
     @Column(nullable = false)
@@ -35,6 +38,7 @@ public class Localization {
     public LocalizationResponse toResponse() {
         return new LocalizationResponse(
                 id,
+                country,
                 town,
                 region,
                 street,

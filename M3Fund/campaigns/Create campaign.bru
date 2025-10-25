@@ -5,25 +5,17 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/projects/1/campaigns
+  url: {{baseUrl}}/projects/3/campaigns
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "endAt": "2025-12-12T12:00:00",
-    "type": "DONATION",
-    "targetBudget": 5000000.00,
-    "rewards": [
-      {
-        "name": "Abonnement Premium",
-        "description": "Accès à toutes les fonctionnalités premium de l'application.",
-        "type": "PRODUCT",
-        "quantity": 100,
-        "unlockAmount": 20000.00
-      }
-    ]
+    "endAt": "2025-10-30T12:00:00",
+    "type": "INVESTMENT",
+    "shareOffered": 4.3,
+    "targetBudget": 42000000
   }
 }
 

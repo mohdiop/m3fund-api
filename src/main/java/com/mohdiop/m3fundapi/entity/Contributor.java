@@ -47,10 +47,13 @@ public class Contributor extends User {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "contributor")
     private Set<Gift> gifts;
 
+    @OneToMany(mappedBy = "contributor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Volunteer> volunteers;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "contributor")
     private Set<RewardWinning> rewardWinnings;
 
     public ContributorResponse toResponse() {
-        return new ContributorResponse(getId(), firstName, lastName, getEmail(), getPhone(), localization.toResponse(), projectDomains, campaignTypes, getState(), getUserCreatedAt());
+        return new ContributorResponse(getId(), firstName, lastName, getEmail(), getPhone(), localization.toResponse(), projectDomains, campaignTypes, getState(), getUserCreatedAt(), getUserRoles());
     }
 }

@@ -4,6 +4,7 @@ import com.mohdiop.m3fundapi.entity.Localization;
 
 public record CreateLocalizationRequest(
 
+        String country,
         String town,
         String region,
         String street,
@@ -13,6 +14,7 @@ public record CreateLocalizationRequest(
     public Localization toLocalization() {
         return Localization.builder()
                 .id(null)
+                .country(country)
                 .town(town)
                 .region(region)
                 .street(street)
