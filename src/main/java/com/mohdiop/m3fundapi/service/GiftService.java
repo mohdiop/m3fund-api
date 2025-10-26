@@ -46,7 +46,9 @@ public class GiftService {
         Gift gift = createGiftRequest.toGift();
         if (!campaign.getRewards().isEmpty()) {
             for (var reward : campaign.getRewards()) {
-                winReward(contributor, reward, gift.getPayment().getAmount(), reward.getUnlockAmount());
+                if(reward.getQuantity() > 0) {
+                    winReward(contributor, reward, gift.getPayment().getAmount(), reward.getUnlockAmount());
+                }
             }
         }
         gift.setContributor(contributor);
@@ -71,6 +73,7 @@ public class GiftService {
         ).isPresent()) {
             return;
         }
+        reward.setQuantity(reward.getQuantity() - 1);
         rewardWinningRepository.save(
                 new RewardWinning(
                         null,
