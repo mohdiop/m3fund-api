@@ -11,7 +11,6 @@ import com.mohdiop.m3fundapi.repository.VolunteerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -40,10 +39,10 @@ public class VolunteerService {
                 .orElseThrow(
                         () -> new EntityNotFoundException("Campagne introuvable.")
                 );
-        if(campaign.getType() != CampaignType.VOLUNTEERING) {
+        if (campaign.getType() != CampaignType.VOLUNTEERING) {
             throw new BadRequestException("C'est pas une campagne de volontariat.");
         }
-        if(campaign.getTargetVolunteer() <= campaign.getCurrentVolunteerNumber()) {
+        if (campaign.getTargetVolunteer() <= campaign.getCurrentVolunteerNumber()) {
             throw new BadRequestException("Nombre de volontaire atteint pour ce projet.");
         }
         if (volunteerRepository.findByContributorIdAndCampaignId(contributorId, campaignId).isPresent()) {
@@ -57,5 +56,12 @@ public class VolunteerService {
                         .contributor(contributor)
                         .build()
         ).toResponse();
+    }
+
+    public boolean isVolunteerOfCampaign(
+            Long contributorId,
+            Long campaignId
+    ) {
+        return volunteerRepository.findByContributorIdAndCampaignId(contributorId, campaignId).isPresent();
     }
 }

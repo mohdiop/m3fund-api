@@ -47,6 +47,9 @@ public class Contributor extends User {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "contributor")
     private Set<Gift> gifts;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "contributor")
+    private Set<CapitalPurchase> capitalPurchases;
+
     @OneToMany(mappedBy = "contributor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Volunteer> volunteers;
 

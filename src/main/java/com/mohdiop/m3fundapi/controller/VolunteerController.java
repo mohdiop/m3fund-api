@@ -7,10 +7,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/projects/campaigns")
@@ -31,6 +28,20 @@ public class VolunteerController {
     ) throws BadRequestException {
         return new ResponseEntity<>(
                 volunteerService.createVolunteer(
+                        authenticationService.getCurrentUserId(),
+                        campaignId
+                ),
+                HttpStatus.CREATED
+        );
+    }
+
+    @PreAuthorize("hasRole('CONTRIBUTOR')")
+    @GetMapping("/{campaignId}/volunteers")
+    public ResponseEntity<Boolean> getContributorVolunteering (
+            @PathVariable Long campaignId
+    ) throws BadRequestException {
+        return new ResponseEntity<>(
+                volunteerService.isVolunteerOfCampaign(
                         authenticationService.getCurrentUserId(),
                         campaignId
                 ),

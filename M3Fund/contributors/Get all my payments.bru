@@ -1,0 +1,15 @@
+meta {
+  name: Get all my payments
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/contributors/payments
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

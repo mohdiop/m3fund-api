@@ -2,6 +2,7 @@ package com.mohdiop.m3fundapi.service;
 
 import com.mohdiop.m3fundapi.dto.request.create.CreateGiftRequest;
 import com.mohdiop.m3fundapi.dto.response.GiftResponse;
+import com.mohdiop.m3fundapi.dto.response.RewardWinningResponse;
 import com.mohdiop.m3fundapi.entity.*;
 import com.mohdiop.m3fundapi.entity.enums.RewardWinningState;
 import com.mohdiop.m3fundapi.repository.CampaignRepository;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class GiftService {
@@ -44,37 +47,41 @@ public class GiftService {
                         () -> new EntityNotFoundException("Campagne introuvable.")
                 );
         Gift gift = createGiftRequest.toGift();
+        gift.setContributor(contributor);
+        gift.setCampaign(campaign);
+        List<RewardWinningResponse> gainedRewards = new ArrayList<>();
         if (!campaign.getRewards().isEmpty()) {
             for (var reward : campaign.getRewards()) {
-                if(reward.getQuantity() > 0) {
-                    winReward(contributor, reward, gift.getPayment().getAmount(), reward.getUnlockAmount());
+                if (reward.getQuantity() > 0) {
+                    var rewardGained = winReward(contributor, reward, gift.getPayment().getAmount(), reward.getUnlockAmount());
+                    if (rewardGained != null) {
+                        gainedRewards.add(rewardGained);
+                    }
                 }
             }
         }
-        gift.setContributor(contributor);
-        gift.setCampaign(campaign);
         return giftRepository.save(
                 gift
-        ).toResponse();
+        ).toResponse(gainedRewards);
     }
 
-    private void winReward(
+    private RewardWinningResponse winReward(
             Contributor contributor,
             Reward reward,
             double paymentAmount,
             double unlockAmount
     ) {
         if (paymentAmount < unlockAmount) {
-            return;
+            return null;
         }
         if (rewardWinningRepository.findByContributorIdAndRewardId(
                 contributor.getId(),
                 reward.getId()
         ).isPresent()) {
-            return;
+            return null;
         }
         reward.setQuantity(reward.getQuantity() - 1);
-        rewardWinningRepository.save(
+        return rewardWinningRepository.save(
                 new RewardWinning(
                         null,
                         LocalDateTime.now(),
@@ -82,6 +89,6 @@ public class GiftService {
                         contributor,
                         reward
                 )
-        );
+        ).toResponse();
     }
 }

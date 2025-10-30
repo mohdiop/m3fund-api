@@ -30,6 +30,10 @@ public class CapitalPurchase {
     @JoinColumn(name = "campaign_id", nullable = false)
     private Campaign campaign;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "contributor_id")
+    private Contributor contributor;
+
     @Column(nullable = false, columnDefinition = "BOOL DEFAULT FALSE")
     private boolean isValidatedByInvestor;
 
