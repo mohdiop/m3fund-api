@@ -1,6 +1,7 @@
 package com.mohdiop.m3fundapi.controller;
 
 import com.mohdiop.m3fundapi.dto.request.create.CreateCampaignRequest;
+import com.mohdiop.m3fundapi.dto.request.update.UpdateCampaignRequest;
 import com.mohdiop.m3fundapi.dto.response.CampaignResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
 import com.mohdiop.m3fundapi.service.CampaignService;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.file.AccessDeniedException;
 
 @RestController
-@RequestMapping("/projects")
 public class CampaignController {
 
     private final CampaignService campaignService;
@@ -25,7 +25,7 @@ public class CampaignController {
     }
 
     @PreAuthorize("hasRole('PROJECT_OWNER')")
-    @PostMapping("/{projectId}/campaigns")
+    @PostMapping("/projects/{projectId}/campaigns")
     public ResponseEntity<CampaignResponse> createCampaign(
             @PathVariable Long projectId,
             @Valid @RequestBody CreateCampaignRequest createCampaignRequest
@@ -37,6 +37,21 @@ public class CampaignController {
                         createCampaignRequest
                 ),
                 HttpStatus.CREATED
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @PutMapping("/campaigns/{campaignId}")
+    public ResponseEntity<CampaignResponse> updateCampaign(
+            @PathVariable Long campaignId,
+            @Valid @RequestBody UpdateCampaignRequest updateCampaignRequest
+    ) throws AccessDeniedException {
+        return ResponseEntity.ok(
+                campaignService.updateCampaign(
+                        authenticationService.getCurrentUserId(),
+                        campaignId,
+                        updateCampaignRequest
+                )
         );
     }
 }

@@ -97,13 +97,15 @@ public class UploadService {
             String filePath = getFilePath(fileName, fileType, fileExtension);
             try (FileOutputStream fos = new FileOutputStream(filePath)) {
                 fos.write(file.getBytes());
+                // Créer une URL accessible via l'API au lieu du chemin local
+                String apiUrl = getApiUrl(fileName, fileType, fileExtension);
                 return com.mohdiop.m3fundapi.entity.File.builder()
                         .id(null)
                         .name(fileName)
                         .sizeKo(file.getSize() / 1024D)
                         .type(fileType)
                         .extension(fileExtension)
-                        .url(filePath)
+                        .url(apiUrl)
                         .build();
             } catch (Exception e) {
                 throw new RuntimeException("Un problème est survenu de notre côté, veuillez réessayer plus tard.");
@@ -147,6 +149,22 @@ public class UploadService {
                     throw new RuntimeException("Un problème est survenu de notre côté, veuillez réessayer plus tard.");
         }
         return filePath;
+    }
+
+    private String getApiUrl(String fileName, FileType fileType, FileExtension fileExtension) {
+        String fileTypePath = switch (fileType) {
+            case PICTURE -> "pictures";
+            case LOGO -> "logos";
+            case VIDEO -> "videos";
+            case RESIDENCE -> "residences";
+            case BIOMETRIC_CARD -> "biometric-cards";
+            case ASSOCIATION_STATUS -> "association-status";
+            case RCCM -> "rccms";
+            case BANK_STATEMENT -> "bank-statements";
+            case BUSINESS_MODEL -> "business-models";
+        };
+        String dotExtension = getDotExtensionType(fileExtension);
+        return "/api/v1/files/" + fileTypePath + "/" + fileName + dotExtension;
     }
 
     private String getDotExtensionType(FileExtension fileExtension) {

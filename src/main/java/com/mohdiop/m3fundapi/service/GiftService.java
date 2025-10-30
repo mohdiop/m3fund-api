@@ -2,6 +2,8 @@ package com.mohdiop.m3fundapi.service;
 
 import com.mohdiop.m3fundapi.dto.request.create.CreateGiftRequest;
 import com.mohdiop.m3fundapi.dto.response.GiftResponse;
+import com.mohdiop.m3fundapi.dto.response.TransactionResponse;
+import com.mohdiop.m3fundapi.dto.response.PaymentResponse;
 import com.mohdiop.m3fundapi.entity.*;
 import com.mohdiop.m3fundapi.entity.enums.RewardWinningState;
 import com.mohdiop.m3fundapi.repository.CampaignRepository;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class GiftService {
@@ -80,5 +83,36 @@ public class GiftService {
                         reward
                 )
         );
+    }
+
+    public List<GiftResponse> getMyGifts(Long contributorId) {
+        List<Gift> gifts = giftRepository.findByContributorIdOrderByDateDesc(contributorId);
+        return gifts.stream().map(Gift::toResponse).toList();
+    }
+
+    public List<TransactionResponse> getMyTransactions(Long userId) {
+        // Essayer d'abord de récupérer en tant que contributeur
+        List<Gift> gifts = giftRepository.findByContributorIdOrderByDateDesc(userId);
+        
+        // Si aucun gift trouvé en tant que contributeur, essayer en tant que project owner
+        if (gifts.isEmpty()) {
+            gifts = giftRepository.findByProjectOwnerIdOrderByDateDesc(userId);
+        }
+        
+        return gifts.stream().map(gift -> {
+            Campaign campaign = gift.getCampaign();
+            Project project = campaign.getProject();
+            
+            return new TransactionResponse(
+                    gift.getId(),
+                    gift.getDate(),
+                    gift.getPayment().toResponse(),
+                    campaign.getId(),
+                    "Campagne de " + campaign.getType().toString().toLowerCase(),
+                    project.getName(),
+                    project.getDomain().toString(),
+                    project.getDescription()
+            );
+        }).toList();
     }
 }

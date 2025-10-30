@@ -17,7 +17,10 @@ public class ValidFileListValidator implements ConstraintValidator<ValidFileList
 
     @Override
     public boolean isValid(Set<MultipartFile> files, ConstraintValidatorContext context) {
-        if (files == null || files.isEmpty()) return false;
+        // Pour les mises à jour partielles, accepter null ou vide (pas de modification)
+        if (files == null || files.isEmpty()) return true;
+        
+        // Si des fichiers sont fournis, ils doivent tous être valides
         return files.stream().allMatch(file ->
                 file != null &&
                         !file.isEmpty() &&

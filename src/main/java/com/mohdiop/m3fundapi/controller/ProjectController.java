@@ -1,6 +1,7 @@
 package com.mohdiop.m3fundapi.controller;
 
 import com.mohdiop.m3fundapi.dto.request.create.CreateProjectRequest;
+import com.mohdiop.m3fundapi.dto.request.update.UpdateProjectRequest;
 import com.mohdiop.m3fundapi.dto.response.OwnerProjectResponse;
 import com.mohdiop.m3fundapi.dto.response.ProjectResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
@@ -11,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.nio.file.AccessDeniedException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/projects")
@@ -45,6 +49,41 @@ public class ProjectController {
     ) throws BadRequestException {
         return ResponseEntity.ok(
                 projectService.validateProject(projectId)
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @PutMapping("/{projectId}")
+    public ResponseEntity<OwnerProjectResponse> updateProject(
+            @PathVariable Long projectId,
+            @Valid @ModelAttribute UpdateProjectRequest updateProjectRequest
+    ) throws AccessDeniedException {
+        return ResponseEntity.ok(
+                projectService.updateProject(
+                        projectId,
+                        authenticationService.getCurrentUserId(),
+                        updateProjectRequest
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @GetMapping("/my-projects")
+    public ResponseEntity<List<OwnerProjectResponse>> getMyProjects() {
+        return ResponseEntity.ok(
+                projectService.getProjectsByOwner(
+                        authenticationService.getCurrentUserId()
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @GetMapping("/my-projects/validated")
+    public ResponseEntity<List<OwnerProjectResponse>> getMyValidatedProjects() {
+        return ResponseEntity.ok(
+                projectService.getValidatedProjectsByOwner(
+                        authenticationService.getCurrentUserId()
+                )
         );
     }
 }

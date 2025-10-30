@@ -1,0 +1,16 @@
+meta {
+  name: Get my gifts
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/projects/campaigns/my-gifts
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

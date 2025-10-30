@@ -2,6 +2,7 @@ package com.mohdiop.m3fundapi.controller;
 
 import com.mohdiop.m3fundapi.dto.request.create.CreateGiftRequest;
 import com.mohdiop.m3fundapi.dto.response.GiftResponse;
+import com.mohdiop.m3fundapi.dto.response.TransactionResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
 import com.mohdiop.m3fundapi.service.GiftService;
 import jakarta.validation.Valid;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/projects/campaigns")
@@ -35,6 +38,26 @@ public class GiftController {
                         createGiftRequest
                 ),
                 HttpStatus.CREATED
+        );
+    }
+
+    @PreAuthorize("hasRole('CONTRIBUTOR')")
+    @GetMapping("/my-gifts")
+    public ResponseEntity<List<GiftResponse>> getMyGifts() {
+        return ResponseEntity.ok(
+                giftService.getMyGifts(
+                        authenticationService.getCurrentUserId()
+                )
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('CONTRIBUTOR', 'PROJECT_OWNER')")
+    @GetMapping("/my-transactions")
+    public ResponseEntity<List<TransactionResponse>> getMyTransactions() {
+        return ResponseEntity.ok(
+                giftService.getMyTransactions(
+                        authenticationService.getCurrentUserId()
+                )
         );
     }
 }
