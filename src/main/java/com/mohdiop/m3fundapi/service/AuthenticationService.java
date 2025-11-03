@@ -50,9 +50,10 @@ public class AuthenticationService {
             }
             case WEB_ADMIN -> {
                 if(!userToAuthenticate.getUserRoles().contains(UserRole.ROLE_SUPER_ADMIN)
-                || !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_PAYMENTS_ADMIN)
-                || !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_USERS_ADMIN)
-                || !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_VALIDATIONS_ADMIN)) {
+                && !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_PAYMENTS_ADMIN)
+                && !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_USERS_ADMIN)
+                && !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_VALIDATIONS_ADMIN)
+                && !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_SYSTEM)) {
                     throw new BadCredentialsException("Email ou mot de passe incorrect.");
                 }
             }

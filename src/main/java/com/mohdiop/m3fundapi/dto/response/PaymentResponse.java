@@ -11,6 +11,7 @@ public record PaymentResponse(
         PaymentType type,
         PaymentState state,
         LocalDateTime madeAt,
-        double amount
+        double amount,
+        String projectName
 ) {
 }

@@ -1,0 +1,26 @@
+meta {
+  name: Get all projects by campaigns
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/projects/campaigns/batch
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxNSIsInR5cGUiOiJBQ0NFU1NfVE9LRU4iLCJyb2xlcyI6WyJST0xFX0NPTlRSSUJVVE9SIl0sImlhdCI6MTc2MjAwMjE0OCwiZXhwIjoxNzYyMDg4NTQ4fQ.J6q0limO74MVIRXSkl7-DMnWf1r21ZelgxBn8d0XDbw
+}
+
+body:json {
+  [
+    1,2,4
+  ]
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

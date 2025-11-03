@@ -37,15 +37,13 @@ public class VolunteerController {
 
     @PreAuthorize("hasRole('CONTRIBUTOR')")
     @GetMapping("/{campaignId}/volunteers")
-    public ResponseEntity<Boolean> getContributorVolunteering (
+    public ResponseEntity<?> getContributorVolunteering (
             @PathVariable Long campaignId
-    ) throws BadRequestException {
-        return new ResponseEntity<>(
-                volunteerService.isVolunteerOfCampaign(
-                        authenticationService.getCurrentUserId(),
-                        campaignId
-                ),
-                HttpStatus.CREATED
+    ) {
+        volunteerService.isVolunteerOfCampaign(
+                authenticationService.getCurrentUserId(),
+                campaignId
         );
+        return ResponseEntity.noContent().build();
     }
 }

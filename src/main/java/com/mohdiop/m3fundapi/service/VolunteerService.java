@@ -4,6 +4,7 @@ import com.mohdiop.m3fundapi.dto.response.VolunteerResponse;
 import com.mohdiop.m3fundapi.entity.Campaign;
 import com.mohdiop.m3fundapi.entity.Contributor;
 import com.mohdiop.m3fundapi.entity.Volunteer;
+import com.mohdiop.m3fundapi.entity.enums.CampaignState;
 import com.mohdiop.m3fundapi.entity.enums.CampaignType;
 import com.mohdiop.m3fundapi.repository.CampaignRepository;
 import com.mohdiop.m3fundapi.repository.ContributorRepository;
@@ -39,6 +40,9 @@ public class VolunteerService {
                 .orElseThrow(
                         () -> new EntityNotFoundException("Campagne introuvable.")
                 );
+        if(campaign.getState() == CampaignState.FINISHED) {
+            throw new BadRequestException("Cette campagne est terminée.");
+        }
         if (campaign.getType() != CampaignType.VOLUNTEERING) {
             throw new BadRequestException("C'est pas une campagne de volontariat.");
         }

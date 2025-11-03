@@ -4,12 +4,14 @@ import com.mohdiop.m3fundapi.dto.request.create.CreateGiftRequest;
 import com.mohdiop.m3fundapi.dto.response.GiftResponse;
 import com.mohdiop.m3fundapi.dto.response.RewardWinningResponse;
 import com.mohdiop.m3fundapi.entity.*;
+import com.mohdiop.m3fundapi.entity.enums.CampaignState;
 import com.mohdiop.m3fundapi.entity.enums.RewardWinningState;
 import com.mohdiop.m3fundapi.repository.CampaignRepository;
 import com.mohdiop.m3fundapi.repository.ContributorRepository;
 import com.mohdiop.m3fundapi.repository.GiftRepository;
 import com.mohdiop.m3fundapi.repository.RewardWinningRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +39,7 @@ public class GiftService {
             Long contributorId,
             Long campaignId,
             CreateGiftRequest createGiftRequest
-    ) {
+    ) throws BadRequestException {
         Contributor contributor = contributorRepository.findById(contributorId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Contributeur introuvable.")
@@ -46,6 +48,9 @@ public class GiftService {
                 .orElseThrow(
                         () -> new EntityNotFoundException("Campagne introuvable.")
                 );
+        if(campaign.getState() == CampaignState.FINISHED) {
+            throw new BadRequestException("Cette campagne terminée.");
+        }
         Gift gift = createGiftRequest.toGift();
         gift.setContributor(contributor);
         gift.setCampaign(campaign);

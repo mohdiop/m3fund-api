@@ -24,7 +24,7 @@ public class Gift {
     @Column(nullable = false)
     private LocalDateTime date;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "payment_id")
     private Payment payment;
 

@@ -1,0 +1,15 @@
+meta {
+  name: Get my recommended campaigns
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/contributors/recommended-campaigns
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

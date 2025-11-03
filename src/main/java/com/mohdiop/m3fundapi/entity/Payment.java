@@ -38,6 +38,12 @@ public class Payment {
     @Column(nullable = false)
     private double amount;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "payment")
+    private Gift gift;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "payment")
+    private CapitalPurchase capitalPurchase;
+
     public PaymentResponse toResponse() {
         return new PaymentResponse(
                 id,
@@ -45,7 +51,8 @@ public class Payment {
                 type,
                 state,
                 carriedOutOn,
-                amount
+                amount,
+                gift == null ? capitalPurchase == null ? "" : capitalPurchase.getCampaign().getProject().getName() : gift.getCampaign().getProject().getName()
         );
     }
 }

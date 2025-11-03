@@ -5,17 +5,32 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/projects/3/campaigns
+  url: {{baseUrl}}/projects/4/campaigns
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "endAt": "2025-10-30T12:00:00",
-    "type": "INVESTMENT",
-    "shareOffered": 4.3,
-    "targetBudget": 42000000
+    "endAt": "2025-11-30T12:00:00",
+    "type": "DONATION",
+    "targetBudget": 12000000,
+    "rewards": [
+      {
+        "name": "Pack Logiciel Pro",
+      "description": "Offre du logiciel pour les professionnels de la santé",
+        "type": "PRODUCT",
+        "quantity": 6,
+        "unlockAmount": 200000
+      },
+      {
+        "name": "Carte patient",
+      "description": "Vous bénéficierez de la carte biométrique du patient",
+        "type": "PRODUCT",
+        "quantity": 300,
+        "unlockAmount": 1000
+      }
+    ]
   }
 }
 

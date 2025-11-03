@@ -45,6 +45,13 @@ public class PublicController {
         );
     }
 
+    @GetMapping("/new-campaigns")
+    public ResponseEntity<List<CampaignResponse>> getNewCampaigns() {
+        return ResponseEntity.ok(
+                campaignService.getNewCampaigns()
+        );
+    }
+
     @PostMapping("/valid-email-and-phone")
     public ResponseEntity<?> checkForValidity(
             @Valid @RequestBody CheckForEmailAndPhoneValidityRequest checkForEmailAndPhoneValidityRequest

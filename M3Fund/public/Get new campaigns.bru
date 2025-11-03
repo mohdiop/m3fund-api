@@ -1,0 +1,15 @@
+meta {
+  name: Get new campaigns
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/public/new-campaigns
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

@@ -40,7 +40,7 @@ public class CapitalPurchase {
     @Column(nullable = false, columnDefinition = "BOOL DEFAULT FALSE")
     private boolean isValidatedByProjectOwner;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "payment_id")
     private Payment payment;
 }

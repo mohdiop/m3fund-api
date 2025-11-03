@@ -5,6 +5,7 @@ import com.mohdiop.m3fundapi.dto.response.GiftResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
 import com.mohdiop.m3fundapi.service.GiftService;
 import jakarta.validation.Valid;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,7 +28,7 @@ public class GiftController {
     public ResponseEntity<GiftResponse> createGift(
             @PathVariable Long campaignId,
             @Valid @RequestBody CreateGiftRequest createGiftRequest
-    ) {
+    ) throws BadRequestException {
         return new ResponseEntity<>(
                 giftService.createGift(
                         authenticationService.getCurrentUserId(),
