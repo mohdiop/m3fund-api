@@ -86,7 +86,7 @@ public class CampaignService {
                 .orElseThrow(
                         () -> new EntityNotFoundException("Utilisateur introuvable")
                 );
-        List<CampaignResponse> campaigns = new ArrayList<>();
+        Set<CampaignResponse> campaigns = new HashSet<>();
         for (CampaignType campaignType : contributor.getCampaignTypes()) {
             var camps = campaignRepository.findByTypeAndState(campaignType, CampaignState.IN_PROGRESS);
             campaigns.addAll(camps.stream().map(Campaign::toResponse).toList());
@@ -101,7 +101,7 @@ public class CampaignService {
                 campaigns.addAll(project.getCampaigns().stream().map(Campaign::toResponse).toList());
             }
         }
-        return campaigns;
+        return campaigns.stream().toList();
     }
 
     public List<ProjectResponse> getProjectsByAllCampaigns(
@@ -112,7 +112,9 @@ public class CampaignService {
     }
 
     public List<CampaignResponse> getNewCampaigns() {
-        List<Campaign> campaigns = campaignRepository.findByLaunchedAtAfterAndStateOrderByLaunchedAtDesc(LocalDateTime.now().minusWeeks(2), CampaignState.IN_PROGRESS);
+        List<Campaign> campaigns = campaignRepository.findByLaunchedAtAfterAndStateOrderByLaunchedAtDesc(
+                LocalDateTime.now().minusWeeks(2), CampaignState.IN_PROGRESS
+        );
         if (campaigns.isEmpty()) return new ArrayList<>();
         return campaigns.stream().map(Campaign::toResponse).toList();
     }
