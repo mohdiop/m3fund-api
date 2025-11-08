@@ -1,0 +1,28 @@
+meta {
+  name: Create capital purchase
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/projects/campaigns/4/capital-purchases
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "shareAcquired": 2.2,
+    "payment": {
+      "transactionId": "12345672981234467899",
+      "type": "ORANGE_MONEY",
+      "state": "SUCCESS",
+      "amount": 613953
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

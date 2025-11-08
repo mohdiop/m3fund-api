@@ -31,7 +31,7 @@ public class Campaign {
     @JoinColumn(nullable = false, name = "project_owner_id")
     private ProjectOwner projectOwner;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "campaign")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "campaign", cascade = CascadeType.ALL)
     private CapitalPurchase capitalPurchase;
 
     @Column(nullable = false)

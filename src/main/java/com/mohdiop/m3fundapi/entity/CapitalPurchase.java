@@ -1,10 +1,8 @@
 package com.mohdiop.m3fundapi.entity;
 
+import com.mohdiop.m3fundapi.dto.response.CapitalPurchaseResponse;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "capital_purchases")
+@Builder
 public class CapitalPurchase {
 
     @Id
@@ -26,7 +25,7 @@ public class CapitalPurchase {
     @Column(name = "share_acquired", columnDefinition = "DOUBLE CHECK (share_acquired >= 0 AND share_acquired <= 100)")
     private double shareAcquired;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "campaign_id", nullable = false)
     private Campaign campaign;
 
@@ -43,4 +42,17 @@ public class CapitalPurchase {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "payment_id")
     private Payment payment;
+
+    public CapitalPurchaseResponse toResponse() {
+        return new CapitalPurchaseResponse(
+                id,
+                date,
+                shareAcquired,
+                campaign.getId(),
+                contributor.getId(),
+                isValidatedByInvestor,
+                isValidatedByProjectOwner,
+                payment.toResponse()
+        );
+    }
 }
