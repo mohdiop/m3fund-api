@@ -24,6 +24,11 @@ public class ValidCampaignValidator implements ConstraintValidator<ValidCampaign
                             .addPropertyNode("targetBudget").addConstraintViolation();
                     valid = false;
                 }
+                if (request.targetVolunteer() == null || request.targetVolunteer() <= 0) {
+                    context.buildConstraintViolationWithTemplate("Le nombre de bénévoles cible est obligatoire pour une campagne de don et doit être supérieur à 0.")
+                            .addPropertyNode("targetVolunteer").addConstraintViolation();
+                    valid = false;
+                }
             }
 
             case VOLUNTEERING -> {

@@ -22,6 +22,8 @@ public record CreateCampaignRequest(
         @NotNull(message = "Le type de campagne est obligatoire.")
         CampaignType type,
 
+        String description,
+
         Long targetVolunteer,
 
         Double targetBudget,
@@ -34,35 +36,45 @@ public record CreateCampaignRequest(
 ) {
 
     public Campaign toDonationCampaign() {
-        return Campaign.builder()
+        Campaign campaign = Campaign.builder()
                 .id(null)
                 .launchedAt(LocalDateTime.now())
                 .endAt(endAt)
                 .targetBudget(targetBudget)
+                .targetVolunteer(targetVolunteer != null ? targetVolunteer : 0L)
                 .type(CampaignType.DONATION)
-                .state(CampaignState.IN_PROGRESS)
+                .state(CampaignState.PENDING)
                 .build();
+        // Définir la description explicitement pour s'assurer qu'elle est sauvegardée même si elle est null
+        campaign.setDescription(description != null && !description.trim().isEmpty() ? description.trim() : null);
+        return campaign;
     }
 
     public Campaign toVolunteeringCampaign() {
-        return Campaign.builder()
+        Campaign campaign = Campaign.builder()
                 .id(null)
                 .launchedAt(LocalDateTime.now())
                 .endAt(endAt)
                 .targetVolunteer(targetVolunteer)
                 .type(CampaignType.VOLUNTEERING)
-                .state(CampaignState.IN_PROGRESS)
+                .state(CampaignState.PENDING)
                 .build();
+        // Définir la description explicitement pour s'assurer qu'elle est sauvegardée même si elle est null
+        campaign.setDescription(description != null && !description.trim().isEmpty() ? description.trim() : null);
+        return campaign;
     }
 
     public Campaign toInvestmentCampaign() {
-        return Campaign.builder()
+        Campaign campaign = Campaign.builder()
                 .id(null)
                 .launchedAt(LocalDateTime.now())
                 .endAt(endAt)
                 .shareOffered(shareOffered)
                 .type(CampaignType.INVESTMENT)
-                .state(CampaignState.IN_PROGRESS)
+                .state(CampaignState.PENDING)
                 .build();
+        // Définir la description explicitement pour s'assurer qu'elle est sauvegardée même si elle est null
+        campaign.setDescription(description != null && !description.trim().isEmpty() ? description.trim() : null);
+        return campaign;
     }
 }

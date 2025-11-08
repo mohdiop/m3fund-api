@@ -13,9 +13,11 @@ import com.mohdiop.m3fundapi.repository.CampaignRepository;
 import com.mohdiop.m3fundapi.repository.ProjectOwnerRepository;
 import com.mohdiop.m3fundapi.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -50,6 +52,16 @@ public class CampaignService {
         if (!Objects.equals(project.getOwner().getId(), owner.getId())) {
             throw new AccessDeniedException("Accès réfusé.");
         }
+        
+        // Vérifier que la date de fin de campagne ne dépasse pas la date de fin du projet
+        LocalDateTime projectEndDate = project.getLaunchedAt();
+        LocalDateTime campaignEndDate = createCampaignRequest.endAt();
+        
+        if (campaignEndDate.isAfter(projectEndDate)) {
+            throw new BadRequestException("La date de fin de la campagne ne peut pas dépasser la date de fin du projet (" + 
+                    projectEndDate.toLocalDate() + ").");
+        }
+        
         Campaign campaign;
         switch (createCampaignRequest.type()) {
             case INVESTMENT -> campaign = createCampaignRequest.toInvestmentCampaign();
@@ -69,7 +81,15 @@ public class CampaignService {
         }
         campaign.setProjectOwner(owner);
         campaign.setProject(project);
-        return campaignRepository.save(campaign).toResponse();
+        
+        // Log pour déboguer
+        System.out.println("Description reçue dans la requête: " + createCampaignRequest.description());
+        System.out.println("Description dans la campagne avant sauvegarde: " + campaign.getDescription());
+        
+        Campaign savedCampaign = campaignRepository.save(campaign);
+        System.out.println("Description dans la campagne après sauvegarde: " + savedCampaign.getDescription());
+        
+        return savedCampaign.toResponse();
     }
 
     public List<CampaignResponse> getAllCampaign() {
@@ -131,10 +151,12 @@ public class CampaignService {
         java.util.Map<String, Long> stats = new java.util.HashMap<>();
         
         stats.put("total", (long) allCampaigns.size());
+        stats.put("pending", allCampaigns.stream()
+                .filter(c -> c.getState() == CampaignState.PENDING)
+                .count());
         stats.put("inProgress", allCampaigns.stream()
                 .filter(c -> c.getState() == CampaignState.IN_PROGRESS)
                 .count());
-        stats.put("pending", 0L); // Not available in current CampaignState enum
         stats.put("completed", allCampaigns.stream()
                 .filter(c -> c.getState() == CampaignState.FINISHED)
                 .count());
@@ -157,6 +179,10 @@ public class CampaignService {
             throw new AccessDeniedException("Accès réfusé.");
         }
 
+        // Récupérer le projet pour valider la date de fin
+        Project project = campaign.getProject();
+        LocalDateTime projectEndDate = project.getLaunchedAt();
+
         // Mettre à jour uniquement les champs non nuls et existants dans l'entité Campaign
         if (updateCampaignRequest.getDescription() != null && !updateCampaignRequest.getDescription().trim().isEmpty()) {
             campaign.setDescription(updateCampaignRequest.getDescription());
@@ -171,7 +197,13 @@ public class CampaignService {
             campaign.setLaunchedAt(updateCampaignRequest.getStartDate());
         }
         if (updateCampaignRequest.getEndDate() != null) {
-            campaign.setEndAt(updateCampaignRequest.getEndDate());
+            // Vérifier que la date de fin de campagne ne dépasse pas la date de fin du projet
+            LocalDateTime newCampaignEndDate = updateCampaignRequest.getEndDate();
+            if (newCampaignEndDate.isAfter(projectEndDate)) {
+                throw new BadRequestException("La date de fin de la campagne ne peut pas dépasser la date de fin du projet (" + 
+                        projectEndDate.toLocalDate() + ").");
+            }
+            campaign.setEndAt(newCampaignEndDate);
         }
         if (updateCampaignRequest.getTargetVolunteer() != null) {
             campaign.setTargetVolunteer(updateCampaignRequest.getTargetVolunteer());

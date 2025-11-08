@@ -107,7 +107,15 @@ public class Campaign {
         int collaboratorCount = calculateCollaboratorCount();
         
         // Calculer la progression
-        double progress = targetBudget > 0 ? (fundsRaised / targetBudget) * 100 : 0;
+        // Pour les campagnes de don, utiliser le nombre de bénévoles au lieu des fonds
+        double progress;
+        if (type == CampaignType.DONATION) {
+            // Pour les campagnes de don, progression basée sur le nombre de bénévoles
+            progress = targetVolunteer > 0 ? (collaboratorCount / (double) targetVolunteer) * 100 : 0;
+        } else {
+            // Pour les autres types, progression basée sur les fonds
+            progress = targetBudget > 0 ? (fundsRaised / targetBudget) * 100 : 0;
+        }
         progress = Math.min(progress, 100); // Cap à 100%
         
         // Calculer la valeur nette (pour les investissements)
@@ -117,11 +125,22 @@ public class Campaign {
         // Nombre de campagnes du projet
         int campaignCount = project.getCampaigns() != null ? project.getCampaigns().size() : 0;
         
+        // Utiliser la description de la campagne si elle existe et n'est pas vide
+        // Ne jamais utiliser la description du projet - seulement celle de la campagne
+        String campaignDescription = (description != null && !description.trim().isEmpty()) 
+                ? description.trim() 
+                : null; // Retourner null au lieu d'une chaîne vide pour distinguer "pas de description" de "description vide"
+        
+        // Log pour déboguer
+        System.out.println("Campaign ID: " + id);
+        System.out.println("Campaign description (raw): " + (description != null ? description : "null"));
+        System.out.println("Campaign description (processed): " + (campaignDescription != null ? campaignDescription : "null"));
+        
         return new CampaignDashboardResponse(
                 id,
                 project.getId(),
                 project.getName(),
-                description != null ? description : project.getDescription(),
+                campaignDescription != null ? campaignDescription : "", // Convertir null en chaîne vide pour le DTO
                 targetBudget,
                 shareOffered,
                 launchedAt,

@@ -2,6 +2,7 @@ package com.mohdiop.m3fundapi.dto.request.create;
 
 import com.mohdiop.m3fundapi.annotation.FileContentType;
 import com.mohdiop.m3fundapi.annotation.FileNotEmpty;
+import com.mohdiop.m3fundapi.annotation.NotPast;
 import com.mohdiop.m3fundapi.annotation.ValidFileList;
 import com.mohdiop.m3fundapi.entity.Project;
 import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
@@ -40,6 +41,7 @@ public record CreateProjectRequest(
         String websiteLink,
 
         @NotNull(message = "La date de lancement est obligatoire.")
+        @NotPast(message = "La date de lancement ne peut pas être dans le passé.")
         LocalDateTime launchedAt,
 
         @NotEmpty(message = "Au moins une image est obligatoire.")
