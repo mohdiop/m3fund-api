@@ -1,6 +1,7 @@
 package com.mohdiop.m3fundapi.controller;
 
 import com.mohdiop.m3fundapi.dto.request.create.CreateCampaignRequest;
+import com.mohdiop.m3fundapi.dto.request.update.UpdateCampaignRequest;
 import com.mohdiop.m3fundapi.dto.response.CampaignResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
 import com.mohdiop.m3fundapi.service.CampaignService;
@@ -37,6 +38,21 @@ public class CampaignController {
                         createCampaignRequest
                 ),
                 HttpStatus.CREATED
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @PatchMapping("/campaigns/{campaignId}")
+    public ResponseEntity<CampaignResponse> updateCampaign(
+            @PathVariable Long campaignId,
+            @Valid @RequestBody UpdateCampaignRequest updateCampaignRequest
+    ) throws AccessDeniedException {
+        return ResponseEntity.ok(
+                campaignService.updateCampaign(
+                        authenticationService.getCurrentUserId(),
+                        campaignId,
+                        updateCampaignRequest
+                )
         );
     }
 }

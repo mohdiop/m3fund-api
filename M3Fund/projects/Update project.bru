@@ -1,0 +1,22 @@
+meta {
+  name: Update project
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/projects/2
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Collab Dev"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

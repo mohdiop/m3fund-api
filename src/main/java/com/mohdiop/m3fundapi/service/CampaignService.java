@@ -1,6 +1,7 @@
 package com.mohdiop.m3fundapi.service;
 
 import com.mohdiop.m3fundapi.dto.request.create.CreateCampaignRequest;
+import com.mohdiop.m3fundapi.dto.request.update.UpdateCampaignRequest;
 import com.mohdiop.m3fundapi.dto.response.CampaignResponse;
 import com.mohdiop.m3fundapi.dto.response.ProjectResponse;
 import com.mohdiop.m3fundapi.entity.Campaign;
@@ -15,9 +16,9 @@ import com.mohdiop.m3fundapi.repository.ContributorRepository;
 import com.mohdiop.m3fundapi.repository.ProjectOwnerRepository;
 import com.mohdiop.m3fundapi.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -74,7 +75,7 @@ public class CampaignService {
         return campaignRepository.save(campaign).toResponse();
     }
 
-    public List<CampaignResponse> getAllCampaign() {
+    public List<CampaignResponse> getAllCampaigns() {
         var allCampaigns = campaignRepository.findAll();
         return allCampaigns.stream().map(Campaign::toResponse).toList();
     }
@@ -118,4 +119,70 @@ public class CampaignService {
         if (campaigns.isEmpty()) return new ArrayList<>();
         return campaigns.stream().map(Campaign::toResponse).toList();
     }
+
+    public CampaignResponse updateCampaign(
+            Long demanderId,
+            Long campaignId,
+            UpdateCampaignRequest updateCampaignRequest
+    ) throws AccessDeniedException {
+        var demander = projectOwnerRepository.findById(demanderId)
+                .orElseThrow(() -> new EntityNotFoundException("Utilisateur introuvable."));
+
+        var campaign = campaignRepository.findById(campaignId)
+                .orElseThrow(() -> new EntityNotFoundException("Campagne introuvable."));
+
+        if (!Objects.equals(demander.getId(), campaign.getProject().getOwner().getId())) {
+            throw new AccessDeniedException("Accès refusé.");
+        }
+
+        if (updateCampaignRequest.endAt() != null) {
+            if (updateCampaignRequest.endAt().isBefore(LocalDateTime.now())) {
+                throw new IllegalArgumentException("La date de fin doit être ultérieure à la date actuelle.");
+            }
+            campaign.setEndAt(updateCampaignRequest.endAt());
+            campaign.setState(CampaignState.IN_PROGRESS);
+        }
+
+        if (updateCampaignRequest.type() != null) {
+            campaign.setType(updateCampaignRequest.type());
+        }
+
+        if (updateCampaignRequest.targetBudget() != null) {
+            if (updateCampaignRequest.targetBudget() < 0) {
+                throw new IllegalArgumentException("Le budget cible doit être positif.");
+            }
+            campaign.setTargetBudget(updateCampaignRequest.targetBudget());
+        }
+
+        if (updateCampaignRequest.targetVolunteer() != null) {
+            if (updateCampaignRequest.targetVolunteer() < 0) {
+                throw new IllegalArgumentException("Le nombre de volontaires cibles doit être positif.");
+            }
+            campaign.setTargetVolunteer(updateCampaignRequest.targetVolunteer());
+        }
+
+        if (updateCampaignRequest.shareOffered() != null) {
+            double share = updateCampaignRequest.shareOffered();
+            if (share < 0 || share > 100) {
+                throw new IllegalArgumentException("La part offerte doit être comprise entre 0 et 100.");
+            }
+            campaign.setShareOffered(share);
+        }
+
+        if (updateCampaignRequest.rewards() != null) {
+            campaign.getRewards().clear();
+            campaign.getRewards().addAll(
+                    updateCampaignRequest.rewards().stream()
+                            .map((r) -> {
+                                var reward = r.toReward();
+                                reward.setCampaign(campaign);
+                                return reward;
+                            })
+                            .toList()
+            );
+        }
+
+        return campaignRepository.save(campaign).toResponse();
+    }
+
 }

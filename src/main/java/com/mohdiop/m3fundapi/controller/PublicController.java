@@ -41,7 +41,7 @@ public class PublicController {
     @GetMapping("/campaigns")
     public ResponseEntity<List<CampaignResponse>> getAllCampaigns() {
         return ResponseEntity.ok(
-                campaignService.getAllCampaign()
+                campaignService.getAllCampaigns()
         );
     }
 
