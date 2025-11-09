@@ -3,14 +3,18 @@ package com.mohdiop.m3fundapi.service;
 import com.mohdiop.m3fundapi.dto.request.create.CreateAssociationProjectOwnerRequest;
 import com.mohdiop.m3fundapi.dto.request.create.CreateIndividualProjectOwnerRequest;
 import com.mohdiop.m3fundapi.dto.request.create.CreateOrganizationProjectOwnerRequest;
+import com.mohdiop.m3fundapi.dto.request.update.UpdateIndividualProjectOwnerRequest;
 import com.mohdiop.m3fundapi.dto.response.AssociationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.IndividualProjectOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.OrganizationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.entity.ProjectOwner;
 import com.mohdiop.m3fundapi.entity.enums.FileType;
+import com.mohdiop.m3fundapi.entity.enums.ProjectOwnerType;
 import com.mohdiop.m3fundapi.repository.ProjectOwnerRepository;
 import com.mohdiop.m3fundapi.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -204,9 +208,101 @@ public class ProjectOwnerService {
                 "Création de compte",
                 """
                         Bonjour, nous procédons à la vérification de vos informations pour la création de votre compte.\
-                        Un mail vous sera envoyé prochainement sous 48h pour vous informer de l'état.
+                        Un mail vous sera envoyé prochainement sous 48h pour vous informer de l'état.\
                         Merci de bien vouloir patienter, l'équipe de M3Fund.
                         """
         );
+    }
+
+    public IndividualProjectOwnerResponse updateIndividualProjectOwner(
+            Long demanderId,
+            UpdateIndividualProjectOwnerRequest updateIndividualProjectOwnerRequest
+    ) throws BadRequestException {
+        var projectOwner = projectOwnerRepository.findById(demanderId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Utilisateur introuvable.")
+                );
+        if (projectOwner.getType() != ProjectOwnerType.INDIVIDUAL) {
+            throw new BadRequestException("Impossible de faire la modification");
+        }
+        if (updateIndividualProjectOwnerRequest.firstName() != null) {
+            projectOwner.setFirstName(updateIndividualProjectOwnerRequest.firstName());
+        }
+        if (updateIndividualProjectOwnerRequest.lastName() != null) {
+            projectOwner.setLastName(updateIndividualProjectOwnerRequest.lastName());
+        }
+        if (updateIndividualProjectOwnerRequest.password() != null) {
+            projectOwner.setPassword(
+                    BCrypt.hashpw(updateIndividualProjectOwnerRequest.password(), BCrypt.gensalt())
+            );
+        }
+        if (updateIndividualProjectOwnerRequest.email() != null) {
+            if (userRepository.findByEmail(updateIndividualProjectOwnerRequest.email()).isPresent()) {
+                throw new BadRequestException("Email indisponible, choisissez en un autre.");
+            }
+            projectOwner.setEmail(updateIndividualProjectOwnerRequest.email());
+        }
+        if (updateIndividualProjectOwnerRequest.phone() != null) {
+            if (userRepository.findByPhone(updateIndividualProjectOwnerRequest.phone()).isPresent()) {
+                throw new BadRequestException("Numéro de téléphone indisponible, choisissez en un autre.");
+            }
+            projectOwner.setPhone(updateIndividualProjectOwnerRequest.phone());
+        }
+
+        if (updateIndividualProjectOwnerRequest.address() != null) {
+            projectOwner.setAddress(updateIndividualProjectOwnerRequest.address());
+        }
+        if (updateIndividualProjectOwnerRequest.annualIncome() != null) {
+            projectOwner.setAnnualIncome(updateIndividualProjectOwnerRequest.annualIncome());
+        }
+        if (updateIndividualProjectOwnerRequest.profilePicture() != null) {
+            projectOwner.setProfilePicture(
+                    uploadService.uploadFile(
+                            updateIndividualProjectOwnerRequest.profilePicture(),
+                            UUID.randomUUID().toString(),
+                            FileType.PICTURE,
+                            uploadService.getFileExtension(
+                                    updateIndividualProjectOwnerRequest.profilePicture()
+                            )
+                    )
+            );
+        }
+        if (updateIndividualProjectOwnerRequest.biometricCard() != null) {
+            projectOwner.setBiometricCard(
+                    uploadService.uploadFile(
+                            updateIndividualProjectOwnerRequest.biometricCard(),
+                            UUID.randomUUID().toString(),
+                            FileType.PICTURE,
+                            uploadService.getFileExtension(
+                                    updateIndividualProjectOwnerRequest.biometricCard()
+                            )
+                    )
+            );
+        }
+        if (updateIndividualProjectOwnerRequest.bankStatement() != null) {
+            projectOwner.setBankStatement(
+                    uploadService.uploadFile(
+                            updateIndividualProjectOwnerRequest.bankStatement(),
+                            UUID.randomUUID().toString(),
+                            FileType.PICTURE,
+                            uploadService.getFileExtension(
+                                    updateIndividualProjectOwnerRequest.bankStatement()
+                            )
+                    )
+            );
+        }
+        if (updateIndividualProjectOwnerRequest.residenceCertificate() != null) {
+            projectOwner.setResidenceCertificate(
+                    uploadService.uploadFile(
+                            updateIndividualProjectOwnerRequest.residenceCertificate(),
+                            UUID.randomUUID().toString(),
+                            FileType.PICTURE,
+                            uploadService.getFileExtension(
+                                    updateIndividualProjectOwnerRequest.residenceCertificate()
+                            )
+                    )
+            );
+        }
+        return projectOwnerRepository.save(projectOwner).toIndividualResponse();
     }
 }

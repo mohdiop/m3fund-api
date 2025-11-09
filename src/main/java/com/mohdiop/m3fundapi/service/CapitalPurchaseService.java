@@ -43,7 +43,7 @@ public class CapitalPurchaseService {
             throw new BadRequestException("La part ne doit pas être supérieure à la part disponible");
         }
 
-        double dueAmount = (campaign.getTargetBudget() * createCapitalPurchaseRequest.shareAcquired()) / 4.3;
+        double dueAmount = (campaign.getTargetBudget() * createCapitalPurchaseRequest.shareAcquired()) / campaign.getShareOffered();
         if (((Double) dueAmount).intValue() != ((Double) createCapitalPurchaseRequest.payment().amount()).intValue()) {
             throw new BadRequestException("Cette somme est différente de la somme à devoir");
         }

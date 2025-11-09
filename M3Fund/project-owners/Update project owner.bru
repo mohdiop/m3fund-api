@@ -1,0 +1,15 @@
+meta {
+  name: Update project owner
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{baseUrl}}/project-owners
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
