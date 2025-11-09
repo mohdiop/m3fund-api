@@ -14,7 +14,7 @@ public class KeepingAliveJob {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     public void keepAlive() {
         ResponseEntity<String> response = restTemplate.getForEntity(
                 keepAliveBaseUrl+"/keep-alive",
