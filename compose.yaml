@@ -1,0 +1,10 @@
+services:
+  mysql:
+    image: 'mysql:latest'
+    environment:
+      - 'MYSQL_DATABASE=m3fund'
+      - 'MYSQL_PASSWORD=m3fund'
+      - 'MYSQL_ROOT_PASSWORD='
+      - 'MYSQL_USER=root'
+    ports:
+      - '3306'
