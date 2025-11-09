@@ -58,7 +58,7 @@ public class ProjectController {
     public ResponseEntity<OwnerProjectResponse> updateProject(
             @PathVariable Long projectId,
             @Valid @ModelAttribute UpdateProjectRequest updateProjectRequest
-    ) throws AccessDeniedException {
+    ) throws AccessDeniedException, BadRequestException {
         return ResponseEntity.ok(
                 projectService.updateProject(
                         projectId,

@@ -69,6 +69,7 @@ public record CreateCampaignRequest(
                 .id(null)
                 .launchedAt(LocalDateTime.now())
                 .endAt(endAt)
+                .targetBudget(targetBudget != null ? targetBudget : 0.0)
                 .shareOffered(shareOffered)
                 .type(CampaignType.INVESTMENT)
                 .state(CampaignState.PENDING)

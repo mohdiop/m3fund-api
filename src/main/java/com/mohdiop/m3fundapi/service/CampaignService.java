@@ -179,6 +179,15 @@ public class CampaignService {
             throw new AccessDeniedException("Accès réfusé.");
         }
 
+        // Vérifier que la campagne n'est pas en cours (IN_PROGRESS) ou complétée
+        if (campaign.getState() == CampaignState.IN_PROGRESS) {
+            throw new BadRequestException("Une campagne en cours ne peut pas être modifiée.");
+        }
+        
+        if (campaign.getState() == CampaignState.FINISHED) {
+            throw new BadRequestException("Une campagne clôturée ne peut pas être modifiée.");
+        }
+
         // Récupérer le projet pour valider la date de fin
         Project project = campaign.getProject();
         LocalDateTime projectEndDate = project.getLaunchedAt();

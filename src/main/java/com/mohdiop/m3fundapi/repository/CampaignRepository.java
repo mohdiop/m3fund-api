@@ -19,18 +19,40 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long> {
     
     /**
      * Trouve toutes les campagnes d'un propriétaire de projet
+     * Charge les relations nécessaires pour calculer fundsRaised
      */
-    List<Campaign> findByProjectOwnerId(Long ownerId);
+    @Query("SELECT DISTINCT c FROM Campaign c " +
+           "LEFT JOIN FETCH c.project " +
+           "LEFT JOIN FETCH c.gifts g " +
+           "LEFT JOIN FETCH g.payment " +
+           "LEFT JOIN FETCH c.capitalPurchase cp " +
+           "LEFT JOIN FETCH cp.payment " +
+           "WHERE c.projectOwner.id = :ownerId")
+    List<Campaign> findByProjectOwnerId(@Param("ownerId") Long ownerId);
     
     /**
      * Trouve les campagnes d'un propriétaire filtrées par projet
+     * Charge les relations nécessaires pour calculer fundsRaised
      */
-    @Query("SELECT c FROM Campaign c WHERE c.projectOwner.id = :ownerId AND c.project.id = :projectId")
+    @Query("SELECT DISTINCT c FROM Campaign c " +
+           "LEFT JOIN FETCH c.project " +
+           "LEFT JOIN FETCH c.gifts g " +
+           "LEFT JOIN FETCH g.payment " +
+           "LEFT JOIN FETCH c.capitalPurchase cp " +
+           "LEFT JOIN FETCH cp.payment " +
+           "WHERE c.projectOwner.id = :ownerId AND c.project.id = :projectId")
     List<Campaign> findByProjectOwnerIdAndProjectId(@Param("ownerId") Long ownerId, @Param("projectId") Long projectId);
     
     /**
      * Trouve les campagnes d'un propriétaire filtrées par statut
+     * Charge les relations nécessaires pour calculer fundsRaised
      */
-    @Query("SELECT c FROM Campaign c WHERE c.projectOwner.id = :ownerId AND c.state = :state")
+    @Query("SELECT DISTINCT c FROM Campaign c " +
+           "LEFT JOIN FETCH c.project " +
+           "LEFT JOIN FETCH c.gifts g " +
+           "LEFT JOIN FETCH g.payment " +
+           "LEFT JOIN FETCH c.capitalPurchase cp " +
+           "LEFT JOIN FETCH cp.payment " +
+           "WHERE c.projectOwner.id = :ownerId AND c.state = :state")
     List<Campaign> findByProjectOwnerIdAndState(@Param("ownerId") Long ownerId, @Param("state") CampaignState state);
 }

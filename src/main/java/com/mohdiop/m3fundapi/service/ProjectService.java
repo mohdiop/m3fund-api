@@ -164,11 +164,17 @@ public class ProjectService {
             Long projectId,
             Long ownerId,
             UpdateProjectRequest updateProjectRequest
-    ) throws AccessDeniedException {
-        Project project = projectRepository.findById(projectId)
+    ) throws AccessDeniedException, BadRequestException {
+        // Charger le projet avec ses images pour éviter les problèmes d'orphanRemoval
+        Project project = projectRepository.findByIdWithImages(projectId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Projet introuvable!")
                 );
+
+        // Initialiser la collection d'images si elle est null (peut arriver si aucune image n'existe)
+        if (project.getImages() == null) {
+            project.setImages(new HashSet<>());
+        }
 
         // Vérifier que l'utilisateur est bien le propriétaire du projet
         if (!Objects.equals(project.getOwner().getId(), ownerId)) {
@@ -198,8 +204,22 @@ public class ProjectService {
             project.setLaunchedAt(updateProjectRequest.launchedAt());
         }
 
-        // Mettre à jour les images si fournies
+        // Mettre à jour les images si fournies - AJOUTER aux images existantes au lieu de remplacer
         if (updateProjectRequest.images() != null && !updateProjectRequest.images().isEmpty()) {
+            // Vérifier le nombre total d'images (existantes + nouvelles)
+            int currentImageCount = project.getImages() != null ? project.getImages().size() : 0;
+            int newImageCount = (int) updateProjectRequest.images().stream()
+                    .filter(img -> img != null && !img.isEmpty())
+                    .count();
+            int totalImageCount = currentImageCount + newImageCount;
+
+            // Vérifier que le total ne dépasse pas 6 images
+            if (totalImageCount > 6) {
+                throw new BadRequestException("Le projet ne peut pas avoir plus de 6 images au total. " +
+                        "Actuellement: " + currentImageCount + ", nouvelles: " + newImageCount);
+            }
+
+            // Ajouter les nouvelles images à la collection existante
             Set<File> newImages = new HashSet<>();
             for (var image : updateProjectRequest.images()) {
                 if (image != null && !image.isEmpty()) {
@@ -213,9 +233,8 @@ public class ProjectService {
                     );
                 }
             }
-            if (!newImages.isEmpty()) {
-                project.setImages(newImages);
-            }
+            // Ajouter les nouvelles images à la collection existante au lieu de la remplacer
+            project.getImages().addAll(newImages);
         }
 
         // Mettre à jour la vidéo si fournie

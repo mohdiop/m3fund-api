@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
     
@@ -44,4 +45,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     // Filtrer les projets d'un propriétaire par domaine
     @Query("SELECT p FROM Project p WHERE p.owner.id = :ownerId AND p.domain = :domain")
     List<Project> findByOwnerIdAndDomain(@Param("ownerId") Long ownerId, @Param("domain") ProjectDomain domain);
+    
+    // Charger un projet avec ses images pour la mise à jour
+    @Query("SELECT DISTINCT p FROM Project p LEFT JOIN FETCH p.images WHERE p.id = :projectId")
+    Optional<Project> findByIdWithImages(@Param("projectId") Long projectId);
 }
