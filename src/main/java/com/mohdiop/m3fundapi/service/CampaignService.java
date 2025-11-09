@@ -40,7 +40,7 @@ public class CampaignService {
             Long ownerId,
             Long projectId,
             CreateCampaignRequest createCampaignRequest
-    ) throws AccessDeniedException {
+    ) throws AccessDeniedException, BadRequestException {
         ProjectOwner owner = projectOwnerRepository.findById(ownerId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Porteur introuvable.")
@@ -169,7 +169,7 @@ public class CampaignService {
             Long ownerId,
             Long campaignId,
             UpdateCampaignRequest updateCampaignRequest
-    ) throws AccessDeniedException {
+    ) throws AccessDeniedException, BadRequestException {
         // Récupérer la campagne
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new EntityNotFoundException("Campagne introuvable."));
@@ -210,5 +210,79 @@ public class CampaignService {
         }
 
         return campaignRepository.save(campaign).toResponse();
+    }
+
+    /**
+     * Récupère toutes les campagnes d'un propriétaire de projet
+     */
+    public List<CampaignDashboardResponse> getCampaignsByOwner(Long ownerId) {
+        List<Campaign> campaigns = campaignRepository.findByProjectOwnerId(ownerId);
+        return campaigns.stream()
+                .map(Campaign::toDashboardResponse)
+                .toList();
+    }
+
+    /**
+     * Récupère les statistiques des campagnes d'un propriétaire
+     */
+    public java.util.Map<String, Long> getCampaignStatsByOwner(Long ownerId) {
+        List<Campaign> campaigns = campaignRepository.findByProjectOwnerId(ownerId);
+        java.util.Map<String, Long> stats = new java.util.HashMap<>();
+        
+        stats.put("total", (long) campaigns.size());
+        stats.put("pending", campaigns.stream()
+                .filter(c -> c.getState() == CampaignState.PENDING)
+                .count());
+        stats.put("inProgress", campaigns.stream()
+                .filter(c -> c.getState() == CampaignState.IN_PROGRESS)
+                .count());
+        stats.put("completed", campaigns.stream()
+                .filter(c -> c.getState() == CampaignState.FINISHED)
+                .count());
+        stats.put("rejected", 0L);
+        
+        return stats;
+    }
+
+    /**
+     * Recherche les campagnes d'un propriétaire par terme de recherche
+     */
+    public List<CampaignDashboardResponse> searchCampaignsByOwner(Long ownerId, String searchTerm) {
+        List<Campaign> campaigns = campaignRepository.findByProjectOwnerId(ownerId);
+        String lowerSearchTerm = searchTerm.toLowerCase();
+        return campaigns.stream()
+                .filter(campaign -> 
+                    campaign.getProject().getName().toLowerCase().contains(lowerSearchTerm) ||
+                    campaign.getProject().getDescription().toLowerCase().contains(lowerSearchTerm) ||
+                    (campaign.getDescription() != null && campaign.getDescription().toLowerCase().contains(lowerSearchTerm))
+                )
+                .map(Campaign::toDashboardResponse)
+                .toList();
+    }
+
+    /**
+     * Filtre les campagnes d'un propriétaire par projet
+     */
+    public List<CampaignDashboardResponse> filterCampaignsByOwnerAndProject(Long ownerId, Long projectId) {
+        List<Campaign> campaigns = campaignRepository.findByProjectOwnerIdAndProjectId(ownerId, projectId);
+        return campaigns.stream()
+                .map(Campaign::toDashboardResponse)
+                .toList();
+    }
+
+    /**
+     * Filtre les campagnes d'un propriétaire par statut
+     */
+    public List<CampaignDashboardResponse> filterCampaignsByOwnerAndStatus(Long ownerId, String status) {
+        CampaignState campaignState;
+        try {
+            campaignState = CampaignState.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return List.of();
+        }
+        List<Campaign> campaigns = campaignRepository.findByProjectOwnerIdAndState(ownerId, campaignState);
+        return campaigns.stream()
+                .map(Campaign::toDashboardResponse)
+                .toList();
     }
 }

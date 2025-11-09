@@ -4,6 +4,7 @@ import com.mohdiop.m3fundapi.dto.request.create.CreateProjectRequest;
 import com.mohdiop.m3fundapi.dto.request.update.UpdateProjectRequest;
 import com.mohdiop.m3fundapi.dto.response.OwnerProjectResponse;
 import com.mohdiop.m3fundapi.dto.response.ProjectResponse;
+import com.mohdiop.m3fundapi.dto.response.ProjectStatsResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
 import com.mohdiop.m3fundapi.service.ProjectService;
 import jakarta.validation.Valid;
@@ -83,6 +84,55 @@ public class ProjectController {
         return ResponseEntity.ok(
                 projectService.getValidatedProjectsByOwner(
                         authenticationService.getCurrentUserId()
+                )
+        );
+    }
+    
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @GetMapping("/my-projects/stats")
+    public ResponseEntity<ProjectStatsResponse> getMyProjectStats() {
+        return ResponseEntity.ok(
+                projectService.getProjectStatsByOwner(
+                        authenticationService.getCurrentUserId()
+                )
+        );
+    }
+    
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @GetMapping("/my-projects/search")
+    public ResponseEntity<List<OwnerProjectResponse>> searchMyProjects(
+            @RequestParam("q") String searchTerm
+    ) {
+        return ResponseEntity.ok(
+                projectService.searchProjectsByOwner(
+                        authenticationService.getCurrentUserId(),
+                        searchTerm
+                )
+        );
+    }
+    
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @GetMapping("/my-projects/status/{status}")
+    public ResponseEntity<List<OwnerProjectResponse>> filterMyProjectsByStatus(
+            @PathVariable String status
+    ) {
+        return ResponseEntity.ok(
+                projectService.filterProjectsByOwnerAndStatus(
+                        authenticationService.getCurrentUserId(),
+                        status
+                )
+        );
+    }
+    
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @GetMapping("/my-projects/domain/{domain}")
+    public ResponseEntity<List<OwnerProjectResponse>> filterMyProjectsByDomain(
+            @PathVariable String domain
+    ) {
+        return ResponseEntity.ok(
+                projectService.filterProjectsByOwnerAndDomain(
+                        authenticationService.getCurrentUserId(),
+                        domain
                 )
         );
     }

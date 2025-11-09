@@ -249,9 +249,8 @@ public class ProjectService {
         ProjectOwner owner = projectOwnerRepository.findById(ownerId)
                 .orElseThrow(() -> new EntityNotFoundException("Porteur introuvable."));
         
-        var projects = projectRepository.findAll();
+        var projects = projectRepository.findByOwnerId(ownerId);
         return projects.stream()
-                .filter(project -> project.getOwner().getId().equals(owner.getId()))
                 .map(Project::toOwnerProjectResponse)
                 .toList();
     }
@@ -260,10 +259,95 @@ public class ProjectService {
         ProjectOwner owner = projectOwnerRepository.findById(ownerId)
                 .orElseThrow(() -> new EntityNotFoundException("Porteur introuvable."));
         
-        var projects = projectRepository.findAll();
+        var projects = projectRepository.findByOwnerIdAndIsValidated(ownerId, true);
         return projects.stream()
-                .filter(project -> project.getOwner().getId().equals(owner.getId()) && project.isValidated())
                 .map(Project::toOwnerProjectResponse)
                 .toList();
+    }
+    
+    /**
+     * Récupère les statistiques des projets d'un propriétaire
+     */
+    public ProjectStatsResponse getProjectStatsByOwner(Long ownerId) {
+        ProjectOwner owner = projectOwnerRepository.findById(ownerId)
+                .orElseThrow(() -> new EntityNotFoundException("Porteur introuvable."));
+        
+        var projects = projectRepository.findByOwnerId(ownerId);
+        
+        long totalProjects = projects.size();
+        long validatedProjects = projects.stream()
+                .filter(Project::isValidated)
+                .count();
+        long pendingProjects = projects.stream()
+                .filter(project -> !project.isValidated())
+                .count();
+        
+        // Compter les projets avec des campagnes actives
+        long projectsWithActiveCampaigns = projects.stream()
+                .filter(project -> project.getCampaigns() != null && 
+                        project.getCampaigns().stream()
+                                .anyMatch(campaign -> campaign.getState() == CampaignState.IN_PROGRESS))
+                .count();
+        
+        return new ProjectStatsResponse(
+                totalProjects,
+                validatedProjects,
+                pendingProjects,
+                projectsWithActiveCampaigns
+        );
+    }
+    
+    /**
+     * Recherche des projets d'un propriétaire
+     */
+    public List<OwnerProjectResponse> searchProjectsByOwner(Long ownerId, String searchTerm) {
+        ProjectOwner owner = projectOwnerRepository.findById(ownerId)
+                .orElseThrow(() -> new EntityNotFoundException("Porteur introuvable."));
+        
+        var projects = projectRepository.searchProjectsByOwner(ownerId, searchTerm);
+        return projects.stream()
+                .map(Project::toOwnerProjectResponse)
+                .toList();
+    }
+    
+    /**
+     * Filtre les projets d'un propriétaire par statut de validation
+     */
+    public List<OwnerProjectResponse> filterProjectsByOwnerAndStatus(Long ownerId, String status) {
+        ProjectOwner owner = projectOwnerRepository.findById(ownerId)
+                .orElseThrow(() -> new EntityNotFoundException("Porteur introuvable."));
+        
+        boolean isValidated;
+        if ("validated".equalsIgnoreCase(status) || "approved".equalsIgnoreCase(status)) {
+            isValidated = true;
+        } else if ("pending".equalsIgnoreCase(status)) {
+            isValidated = false;
+        } else {
+            // Si le statut n'est pas reconnu, retourner une liste vide
+            return List.of();
+        }
+        
+        var projects = projectRepository.findByOwnerIdAndIsValidated(ownerId, isValidated);
+        return projects.stream()
+                .map(Project::toOwnerProjectResponse)
+                .toList();
+    }
+    
+    /**
+     * Filtre les projets d'un propriétaire par domaine
+     */
+    public List<OwnerProjectResponse> filterProjectsByOwnerAndDomain(Long ownerId, String domainStr) {
+        ProjectOwner owner = projectOwnerRepository.findById(ownerId)
+                .orElseThrow(() -> new EntityNotFoundException("Porteur introuvable."));
+        
+        try {
+            ProjectDomain domain = ProjectDomain.valueOf(domainStr.toUpperCase());
+            var projects = projectRepository.findByOwnerIdAndDomain(ownerId, domain);
+            return projects.stream()
+                    .map(Project::toOwnerProjectResponse)
+                    .toList();
+        } catch (IllegalArgumentException e) {
+            return List.of();
+        }
     }
 }
