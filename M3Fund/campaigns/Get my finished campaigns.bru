@@ -1,0 +1,15 @@
+meta {
+  name: Get my finished campaigns
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/projects/campaigns/mine-finished
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,17 +1,17 @@
 meta {
-  name: Search my projects by domain
+  name: Search campaigns
   type: http
-  seq: 10
+  seq: 3
 }
 
 get {
-  url: {{baseUrl}}/projects/domain?d=COMPUTER_SCIENCE
+  url: {{baseUrl}}/projects/campaigns/search?q=dev
   body: none
   auth: inherit
 }
 
 params:query {
-  d: COMPUTER_SCIENCE
+  q: dev
 }
 
 settings {

@@ -12,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/projects")
@@ -52,6 +54,73 @@ public class CampaignController {
                         authenticationService.getCurrentUserId(),
                         campaignId,
                         updateCampaignRequest
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @GetMapping("/campaigns/mine")
+    public ResponseEntity<List<CampaignResponse>> getMyCampaigns() {
+        return ResponseEntity.ok(
+                campaignService.getMyCampaigns(
+                        authenticationService.getCurrentUserId()
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @GetMapping("/campaigns/mine-active")
+    public ResponseEntity<List<CampaignResponse>> getMyActiveCampaigns() {
+        return ResponseEntity.ok(
+                campaignService.getActiveCampaigns(
+                        authenticationService.getCurrentUserId()
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @GetMapping("/campaigns/mine-finished")
+    public ResponseEntity<List<CampaignResponse>> getMyFinishedCampaigns() {
+        return ResponseEntity.ok(
+                campaignService.getFinishedCampaigns(
+                        authenticationService.getCurrentUserId()
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @GetMapping("/{projectId}/campaigns")
+    public ResponseEntity<List<CampaignResponse>> getByProjectId(
+            @PathVariable Long projectId
+    ) {
+        return ResponseEntity.ok(
+                campaignService.getCampaignsByOwnerIdAndProjectId(
+                        authenticationService.getCurrentUserId(),
+                        projectId
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @GetMapping("/campaigns/search")
+    public ResponseEntity<List<CampaignResponse>> searchCampaigns(
+            @RequestParam("q") String searchTerm
+    ) {
+        return ResponseEntity.ok(
+                campaignService.searchByTerm(
+                        authenticationService.getCurrentUserId(),
+                        searchTerm
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @GetMapping("/campaigns/stats")
+    public ResponseEntity<Map<String, Long>> getMyCampaignsStats(
+    ) {
+        return ResponseEntity.ok(
+                campaignService.getCampaignsStats(
+                        authenticationService.getCurrentUserId()
                 )
         );
     }

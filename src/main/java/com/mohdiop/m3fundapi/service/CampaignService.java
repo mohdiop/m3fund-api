@@ -185,4 +185,82 @@ public class CampaignService {
         return campaignRepository.save(campaign).toResponse();
     }
 
+    public List<CampaignResponse> getMyCampaigns(
+            Long ownerId
+    ) {
+        var campaigns = campaignRepository.findByProjectOwnerId(ownerId);
+        if (campaigns.isEmpty()) return new ArrayList<>();
+        return campaigns.stream().map(Campaign::toResponse).toList();
+    }
+
+    public List<CampaignResponse> getActiveCampaigns(
+            Long ownerId
+    ) {
+        var campaigns = campaignRepository.findByProjectOwnerIdAndState(ownerId, CampaignState.IN_PROGRESS);
+        if (campaigns.isEmpty()) return new ArrayList<>();
+        return campaigns.stream().map(Campaign::toResponse).toList();
+    }
+
+    public List<CampaignResponse> getFinishedCampaigns(
+            Long ownerId
+    ) {
+        var campaigns = campaignRepository.findByProjectOwnerIdAndState(ownerId, CampaignState.FINISHED);
+        if (campaigns.isEmpty()) return new ArrayList<>();
+        return campaigns.stream().map(Campaign::toResponse).toList();
+    }
+
+    public List<CampaignResponse> getCampaignsByOwnerIdAndProjectId(
+            Long ownerId,
+            Long projectId
+    ) {
+        var owner = projectOwnerRepository.findById(ownerId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Utilisateur introuvable.")
+                );
+        var project = projectRepository.findById(projectId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Projet introuvable.")
+                );
+        if (!Objects.equals(project.getOwner().getId(), owner.getId())) {
+            throw new AccessDeniedException("Accès réfusé.");
+        }
+        var campaigns = campaignRepository.findByProjectOwnerIdAndProjectId(ownerId, projectId);
+        if (campaigns.isEmpty()) return new ArrayList<>();
+        return campaigns.stream().map(Campaign::toResponse).toList();
+    }
+
+    public List<CampaignResponse> searchByTerm(
+            Long ownerId,
+            String searchTerm
+    ) {
+        var projects = projectRepository.searchOwnerProjects(ownerId, searchTerm);
+        if (projects.isEmpty()) return new ArrayList<>();
+        var campaignProjects = projects.stream()
+                .filter(project -> !project.getCampaigns().isEmpty()).toList();
+        var campaigns = new ArrayList<CampaignResponse>();
+        for (Project campaignProject : campaignProjects) {
+            campaigns.addAll(
+                    campaignProject.getCampaigns().stream().map(Campaign::toResponse).toList()
+            );
+        }
+        return campaigns;
+    }
+
+    public Map<String, Long> getCampaignsStats(
+            Long ownerId
+    ) {
+        var campaigns = campaignRepository.findByProjectOwnerId(ownerId);
+        var stats = new HashMap<String, Long>();
+        if (campaigns.isEmpty()) {
+            stats.put("total", 0L);
+            stats.put("inProgress", 0L);
+            stats.put("finished", 0L);
+            return stats;
+        }
+        stats.put("total", (long) campaigns.size());
+        stats.put("inProgress", campaigns.stream().filter(campaign -> campaign.getState() == CampaignState.IN_PROGRESS).count());
+        stats.put("finished", campaigns.stream().filter(campaign -> campaign.getState() == CampaignState.FINISHED).count());
+        return stats;
+    }
+
 }

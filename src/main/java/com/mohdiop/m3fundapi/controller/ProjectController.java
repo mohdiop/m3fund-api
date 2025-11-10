@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
@@ -72,7 +71,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponse> updateProject(
             @PathVariable Long id,
             @Valid @RequestBody UpdateProjectRequest updateProjectRequest
-    ) throws AccessDeniedException {
+    ) {
         return ResponseEntity.ok(
                 projectService.updateProject(
                         id,
