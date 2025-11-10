@@ -4,10 +4,13 @@ import com.mohdiop.m3fundapi.dto.request.create.CreateProjectRequest;
 import com.mohdiop.m3fundapi.dto.request.update.UpdateProjectRequest;
 import com.mohdiop.m3fundapi.dto.response.OwnerProjectResponse;
 import com.mohdiop.m3fundapi.dto.response.ProjectResponse;
+import com.mohdiop.m3fundapi.dto.response.ProjectsStatsResponse;
 import com.mohdiop.m3fundapi.entity.File;
 import com.mohdiop.m3fundapi.entity.Project;
 import com.mohdiop.m3fundapi.entity.ProjectOwner;
+import com.mohdiop.m3fundapi.entity.enums.CampaignState;
 import com.mohdiop.m3fundapi.entity.enums.FileType;
+import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
 import com.mohdiop.m3fundapi.repository.ProjectOwnerRepository;
 import com.mohdiop.m3fundapi.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -163,4 +166,72 @@ public class ProjectService {
         return saved.toResponse();
     }
 
+    public List<ProjectResponse> getMyProjects(
+            Long ownerId
+    ) {
+        var projects = projectRepository.findByOwnerId(ownerId);
+        if (projects.isEmpty()) return new ArrayList<>();
+        return projects.stream().map(Project::toResponse).toList();
+    }
+
+    public List<ProjectResponse> getMyValidatedProjects(
+            Long ownerId
+    ) {
+        var projects = projectRepository.findByOwnerIdAndIsValidated(ownerId, true);
+        if (projects.isEmpty()) return new ArrayList<>();
+        return projects.stream().map(Project::toResponse).toList();
+    }
+
+    public List<ProjectResponse> getMyUnvalidatedProjects(
+            Long ownerId
+    ) {
+        var projects = projectRepository.findByOwnerIdAndIsValidated(ownerId, false);
+        if (projects.isEmpty()) return new ArrayList<>();
+        return projects.stream().map(Project::toResponse).toList();
+    }
+
+    public ProjectsStatsResponse getMyProjectsStats(
+            Long ownerId
+    ) {
+        var projects = projectRepository.findByOwnerId(ownerId);
+        if (projects.isEmpty()) return new ProjectsStatsResponse(0L, 0L, 0L, 0L);
+
+        long totalProjects = projects.size();
+        long validatedProjects = projects.stream()
+                .filter(Project::isValidated)
+                .count();
+        long pendingProjects = projects.stream()
+                .filter(p -> !p.isValidated())
+                .count();
+        long projectsWithActiveCampaigns = projects.stream()
+                .filter(p -> p.getCampaigns() != null &&
+                        p.getCampaigns().stream().anyMatch(
+                                campaign -> campaign.getState() == CampaignState.IN_PROGRESS
+                        ))
+                .count();
+        return new ProjectsStatsResponse(
+                totalProjects,
+                validatedProjects,
+                pendingProjects,
+                projectsWithActiveCampaigns
+        );
+    }
+
+    public List<ProjectResponse> searchProjectsByTerm(
+            Long ownerId,
+            String searchTerm
+    ) {
+        var projects = projectRepository.searchOwnerProjects(ownerId, searchTerm);
+        if (projects.isEmpty()) return new ArrayList<>();
+        return projects.stream().map(Project::toResponse).toList();
+    }
+
+    public List<ProjectResponse> getProjectsByDomain(
+            Long ownerId,
+            ProjectDomain domain
+    ) {
+        var projects = projectRepository.findByOwnerIdAndDomain(ownerId, domain);
+        if (projects.isEmpty()) return new ArrayList<>();
+        return projects.stream().map(Project::toResponse).toList();
+    }
 }

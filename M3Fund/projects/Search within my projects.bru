@@ -1,0 +1,20 @@
+meta {
+  name: Search within my projects
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/projects/search?q=CollabDev
+  body: none
+  auth: inherit
+}
+
+params:query {
+  q: CollabDev
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

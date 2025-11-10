@@ -1,0 +1,20 @@
+meta {
+  name: Search my projects by domain
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/projects/domain?d=BREEDING
+  body: none
+  auth: inherit
+}
+
+params:query {
+  d: BREEDING
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
