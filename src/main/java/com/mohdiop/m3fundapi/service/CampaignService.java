@@ -4,23 +4,19 @@ import com.mohdiop.m3fundapi.dto.request.create.CreateCampaignRequest;
 import com.mohdiop.m3fundapi.dto.request.update.UpdateCampaignRequest;
 import com.mohdiop.m3fundapi.dto.response.CampaignResponse;
 import com.mohdiop.m3fundapi.dto.response.ProjectResponse;
-import com.mohdiop.m3fundapi.entity.Campaign;
-import com.mohdiop.m3fundapi.entity.Project;
-import com.mohdiop.m3fundapi.entity.ProjectOwner;
-import com.mohdiop.m3fundapi.entity.Reward;
+import com.mohdiop.m3fundapi.entity.*;
 import com.mohdiop.m3fundapi.entity.enums.CampaignState;
 import com.mohdiop.m3fundapi.entity.enums.CampaignType;
+import com.mohdiop.m3fundapi.entity.enums.NotificationType;
 import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
-import com.mohdiop.m3fundapi.repository.CampaignRepository;
-import com.mohdiop.m3fundapi.repository.ContributorRepository;
-import com.mohdiop.m3fundapi.repository.ProjectOwnerRepository;
-import com.mohdiop.m3fundapi.repository.ProjectRepository;
+import com.mohdiop.m3fundapi.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CampaignService {
@@ -29,12 +25,16 @@ public class CampaignService {
     private final ProjectOwnerRepository projectOwnerRepository;
     private final ProjectRepository projectRepository;
     private final ContributorRepository contributorRepository;
+    private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
 
-    public CampaignService(CampaignRepository campaignRepository, ProjectOwnerRepository projectOwnerRepository, ProjectRepository projectRepository, ContributorRepository contributorRepository) {
+    public CampaignService(CampaignRepository campaignRepository, ProjectOwnerRepository projectOwnerRepository, ProjectRepository projectRepository, ContributorRepository contributorRepository, UserRepository userRepository, NotificationRepository notificationRepository) {
         this.campaignRepository = campaignRepository;
         this.projectOwnerRepository = projectOwnerRepository;
         this.projectRepository = projectRepository;
         this.contributorRepository = contributorRepository;
+        this.userRepository = userRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     public CampaignResponse createCampaign(
@@ -261,6 +261,93 @@ public class CampaignService {
         stats.put("inProgress", campaigns.stream().filter(campaign -> campaign.getState() == CampaignState.IN_PROGRESS).count());
         stats.put("finished", campaigns.stream().filter(campaign -> campaign.getState() == CampaignState.FINISHED).count());
         return stats;
+    }
+
+    public void finishCampaigns() {
+        var allCampaigns = campaignRepository.findByState(CampaignState.IN_PROGRESS);
+        for (Campaign campaign : allCampaigns) {
+            if (campaign.getEndAt().isBefore(LocalDateTime.now())) {
+                campaign.setState(CampaignState.FINISHED);
+                campaignRepository.save(campaign);
+                sendCampaignFinishedNotification(campaign.getProjectOwner().getId(), campaign.getProject().getName());
+                switch (campaign.getType()) {
+                    case INVESTMENT -> sendCampaignFinishedNotificationToContributors(
+                            new ArrayList<>(
+                                    Collections.singleton(campaign.getCapitalPurchase().getContributor())
+                            ), campaign.getProject().getName()
+                    );
+                    case VOLUNTEERING -> sendCampaignFinishedNotificationToContributors(
+                            campaign.getVolunteers().stream().map(Volunteer::getContributor).collect(Collectors.toSet()).stream().toList(),
+                            campaign.getProject().getName()
+                    );
+                    case DONATION -> sendCampaignFinishedNotificationToContributors(
+                            campaign.getGifts().stream().map(Gift::getContributor).collect(Collectors.toSet()).stream().toList(),
+                            campaign.getProject().getName()
+                    );
+                }
+            }
+        }
+    }
+
+    public void sendCampaignFinishedNotification(
+            Long ownerId,
+            String projectName
+    ) {
+        var system = userRepository.findById(1L)
+                .orElseThrow(
+                        () -> new RuntimeException("Un problème interne est survenu.")
+                );
+        var owner = projectOwnerRepository.findById(ownerId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Porteur introuvable.")
+                );
+        String title = "Campagne terminée";
+        String content = String.format(
+                "La campagne pour votre projet %s vient de terminer.",
+                projectName
+        );
+        notificationRepository.save(
+                new Notification(
+                        null,
+                        title,
+                        content,
+                        system,
+                        owner,
+                        LocalDateTime.now(),
+                        false,
+                        NotificationType.CAMPAIGN_FINISHED
+                )
+        );
+    }
+
+    public void sendCampaignFinishedNotificationToContributors(
+            List<Contributor> contributors,
+            String projectName
+    ) {
+        var system = userRepository.findById(1L)
+                .orElseThrow(
+                        () -> new RuntimeException("Un problème interne est survenu.")
+                );
+        String title = "Campagne terminée";
+        String content = String.format(
+                "La campagne pour le projet %s auquel vous avez contribué vient de terminer.",
+                projectName
+        );
+        notificationRepository.saveAll(
+                contributors.stream().map(
+                        contributor ->
+                                new Notification(
+                                        null,
+                                        title,
+                                        content,
+                                        system,
+                                        contributor,
+                                        LocalDateTime.now(),
+                                        false,
+                                        NotificationType.CAMPAIGN_FINISHED
+                                )
+                ).collect(Collectors.toSet())
+        );
     }
 
 }

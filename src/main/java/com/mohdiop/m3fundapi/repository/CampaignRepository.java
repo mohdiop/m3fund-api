@@ -17,6 +17,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long> {
 
     List<Campaign> findByLaunchedAtAfterAndStateOrderByLaunchedAtDesc(LocalDateTime launchedAt, CampaignState state);
 
+    List<Campaign> findByState(CampaignState state);
+
     @Modifying
     @Query("UPDATE Campaign n SET n.state = com.mohdiop.m3fundapi.entity.enums.CampaignState.FINISHED " +
             "WHERE n.endAt < CURRENT_TIMESTAMP AND n.state = com.mohdiop.m3fundapi.entity.enums.CampaignState.IN_PROGRESS")
