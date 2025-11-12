@@ -40,7 +40,7 @@ public record CreateCampaignRequest(
                 .endAt(endAt)
                 .targetBudget(targetBudget)
                 .type(CampaignType.DONATION)
-                .state(CampaignState.IN_PROGRESS)
+                .state(CampaignState.PENDING)
                 .build();
     }
 
@@ -51,7 +51,7 @@ public record CreateCampaignRequest(
                 .endAt(endAt)
                 .targetVolunteer(targetVolunteer)
                 .type(CampaignType.VOLUNTEERING)
-                .state(CampaignState.IN_PROGRESS)
+                .state(CampaignState.PENDING)
                 .build();
     }
 
@@ -62,7 +62,7 @@ public record CreateCampaignRequest(
                 .endAt(endAt)
                 .shareOffered(shareOffered)
                 .type(CampaignType.INVESTMENT)
-                .state(CampaignState.IN_PROGRESS)
+                .state(CampaignState.PENDING)
                 .build();
     }
 }

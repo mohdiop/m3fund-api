@@ -56,7 +56,11 @@ public class CampaignService {
         Campaign campaign;
         switch (createCampaignRequest.type()) {
             case INVESTMENT -> campaign = createCampaignRequest.toInvestmentCampaign();
-            case VOLUNTEERING -> campaign = createCampaignRequest.toVolunteeringCampaign();
+            case VOLUNTEERING -> {
+                campaign = createCampaignRequest.toVolunteeringCampaign();
+                // Initialiser la collection volunteers pour éviter les NullPointerException
+                campaign.setVolunteers(new HashSet<>());
+            }
             case DONATION -> {
                 campaign = createCampaignRequest.toDonationCampaign();
                 Set<Reward> rewards = new HashSet<>();
@@ -67,8 +71,20 @@ public class CampaignService {
                     reward.setCampaign(campaign);
                 }
                 campaign.setRewards(rewards);
+                // Initialiser la collection gifts pour éviter les NullPointerException
+                campaign.setGifts(new HashSet<>());
             }
             default -> campaign = null;
+        }
+        // Initialiser les collections qui ne sont pas encore initialisées
+        if (campaign.getRewards() == null) {
+            campaign.setRewards(new HashSet<>());
+        }
+        if (campaign.getGifts() == null) {
+            campaign.setGifts(new HashSet<>());
+        }
+        if (campaign.getVolunteers() == null) {
+            campaign.setVolunteers(new HashSet<>());
         }
         campaign.setProjectOwner(owner);
         campaign.setProject(project);
@@ -76,8 +92,9 @@ public class CampaignService {
     }
 
     public List<CampaignResponse> getAllCampaigns() {
-        var allCampaigns = campaignRepository.findAll();
-        return allCampaigns.stream().map(Campaign::toResponse).toList();
+        // Ne retourner que les campagnes validées et en cours (IN_PROGRESS)
+        var activeCampaigns = campaignRepository.findByState(CampaignState.IN_PROGRESS);
+        return activeCampaigns.stream().map(Campaign::toResponse).toList();
     }
 
     public List<CampaignResponse> getContributorRecommendation(
@@ -135,12 +152,17 @@ public class CampaignService {
             throw new AccessDeniedException("Accès refusé.");
         }
 
+        // Vérifier que la campagne n'est pas clôturée
+        if (campaign.getState() == CampaignState.FINISHED) {
+            throw new IllegalArgumentException("Impossible de modifier une campagne clôturée.");
+        }
+
         if (updateCampaignRequest.endAt() != null) {
             if (updateCampaignRequest.endAt().isBefore(LocalDateTime.now())) {
                 throw new IllegalArgumentException("La date de fin doit être ultérieure à la date actuelle.");
             }
             campaign.setEndAt(updateCampaignRequest.endAt());
-            campaign.setState(CampaignState.IN_PROGRESS);
+            // Ne pas changer le statut lors de la mise à jour - seul l'admin peut valider
         }
 
         if (updateCampaignRequest.type() != null) {
@@ -253,37 +275,64 @@ public class CampaignService {
         var stats = new HashMap<String, Long>();
         if (campaigns.isEmpty()) {
             stats.put("total", 0L);
+            stats.put("pending", 0L);
             stats.put("inProgress", 0L);
             stats.put("finished", 0L);
             return stats;
         }
         stats.put("total", (long) campaigns.size());
+        stats.put("pending", campaigns.stream().filter(campaign -> campaign.getState() == CampaignState.PENDING).count());
         stats.put("inProgress", campaigns.stream().filter(campaign -> campaign.getState() == CampaignState.IN_PROGRESS).count());
         stats.put("finished", campaigns.stream().filter(campaign -> campaign.getState() == CampaignState.FINISHED).count());
         return stats;
     }
 
     public void finishCampaigns() {
+        LocalDateTime now = LocalDateTime.now();
         var allCampaigns = campaignRepository.findByState(CampaignState.IN_PROGRESS);
         for (Campaign campaign : allCampaigns) {
-            if (campaign.getEndAt().isBefore(LocalDateTime.now())) {
+            // Clôturer la campagne si la date de fin est passée ou égale à maintenant
+            // Utiliser !isAfter pour inclure les campagnes dont la date de fin est exactement maintenant
+            if (!campaign.getEndAt().isAfter(now)) {
                 campaign.setState(CampaignState.FINISHED);
                 campaignRepository.save(campaign);
                 sendCampaignFinishedNotification(campaign.getProjectOwner().getId(), campaign.getProject().getName());
                 switch (campaign.getType()) {
-                    case INVESTMENT -> sendCampaignFinishedNotificationToContributors(
-                            new ArrayList<>(
-                                    Collections.singleton(campaign.getCapitalPurchase().getContributor())
-                            ), campaign.getProject().getName()
-                    );
-                    case VOLUNTEERING -> sendCampaignFinishedNotificationToContributors(
-                            campaign.getVolunteers().stream().map(Volunteer::getContributor).collect(Collectors.toSet()).stream().toList(),
-                            campaign.getProject().getName()
-                    );
-                    case DONATION -> sendCampaignFinishedNotificationToContributors(
-                            campaign.getGifts().stream().map(Gift::getContributor).collect(Collectors.toSet()).stream().toList(),
-                            campaign.getProject().getName()
-                    );
+                    case INVESTMENT -> {
+                        if (campaign.getCapitalPurchase() != null && campaign.getCapitalPurchase().getContributor() != null) {
+                            sendCampaignFinishedNotificationToContributors(
+                                    new ArrayList<>(
+                                            Collections.singleton(campaign.getCapitalPurchase().getContributor())
+                                    ), campaign.getProject().getName()
+                            );
+                        }
+                    }
+                    case VOLUNTEERING -> {
+                        if (campaign.getVolunteers() != null && !campaign.getVolunteers().isEmpty()) {
+                            sendCampaignFinishedNotificationToContributors(
+                                    campaign.getVolunteers().stream()
+                                            .map(Volunteer::getContributor)
+                                            .filter(java.util.Objects::nonNull)
+                                            .collect(Collectors.toSet())
+                                            .stream()
+                                            .toList(),
+                                    campaign.getProject().getName()
+                            );
+                        }
+                    }
+                    case DONATION -> {
+                        if (campaign.getGifts() != null && !campaign.getGifts().isEmpty()) {
+                            sendCampaignFinishedNotificationToContributors(
+                                    campaign.getGifts().stream()
+                                            .map(Gift::getContributor)
+                                            .filter(java.util.Objects::nonNull)
+                                            .collect(Collectors.toSet())
+                                            .stream()
+                                            .toList(),
+                                    campaign.getProject().getName()
+                            );
+                        }
+                    }
                 }
             }
         }

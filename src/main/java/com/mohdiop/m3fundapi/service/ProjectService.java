@@ -118,6 +118,15 @@ public class ProjectService {
             throw new AccessDeniedException("Accès refusé.");
         }
 
+        // Vérifier que le projet n'est pas clôturé (toutes les campagnes sont FINISHED)
+        if (project.getCampaigns() != null && !project.getCampaigns().isEmpty()) {
+            boolean allCampaignsFinished = project.getCampaigns().stream()
+                    .allMatch(campaign -> campaign.getState() == CampaignState.FINISHED);
+            if (allCampaignsFinished) {
+                throw new IllegalArgumentException("Impossible de modifier un projet dont toutes les campagnes sont clôturées.");
+            }
+        }
+
         if (request.name() != null) project.setName(request.name());
         if (request.resume() != null) project.setResume(request.resume());
         if (request.description() != null) project.setDescription(request.description());

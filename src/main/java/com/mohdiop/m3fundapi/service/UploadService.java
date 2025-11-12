@@ -157,6 +157,7 @@ public class UploadService {
             case GIF -> ".gif";
             case BMP -> ".bmp";
             case WEBP -> ".webp";
+            case AVIF -> ".avif";
             case MP4 -> ".mp4";
             case MOV -> ".mov";
             case AVI -> ".avi";
@@ -198,6 +199,9 @@ public class UploadService {
             }
             case "image/webp" -> {
                 return FileExtension.WEBP;
+            }
+            case "image/avif" -> {
+                return FileExtension.AVIF;
             }
             case "video/mp4" -> {
                 return FileExtension.MP4;

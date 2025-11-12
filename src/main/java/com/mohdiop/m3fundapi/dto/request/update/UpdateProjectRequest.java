@@ -40,8 +40,8 @@ public record UpdateProjectRequest(
 
         @Size(max = 6, message = "Vous pouvez fournir au maximum 6 images.")
         @ValidFileListForPatch(
-                allowed = {"image/jpeg", "image/png"},
-                message = "Toutes les images doivent être au format JPG ou PNG."
+                allowed = {"image/jpeg", "image/png", "image/avif", "image/webp"},
+                message = "Toutes les images doivent être au format JPG, PNG, AVIF ou WEBP."
         )
         Set<MultipartFile> images,
 
