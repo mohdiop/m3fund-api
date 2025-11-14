@@ -1,7 +1,6 @@
 package com.mohdiop.m3fundapi.dto.request.create;
 
 import com.mohdiop.m3fundapi.entity.Contributor;
-import com.mohdiop.m3fundapi.entity.Localization;
 import com.mohdiop.m3fundapi.entity.enums.CampaignType;
 import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
 import com.mohdiop.m3fundapi.entity.enums.UserRole;
