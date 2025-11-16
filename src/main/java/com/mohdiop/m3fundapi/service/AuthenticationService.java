@@ -39,27 +39,34 @@ public class AuthenticationService {
     }
 
     public TokenPairResponse authenticate(AuthenticationRequest authenticationRequest) {
-        User userToAuthenticate = userRepository.findByEmail(authenticationRequest.email())
-                .orElseThrow(() -> new BadCredentialsException("Email ou mot de passe incorrect."));
+        User userToAuthenticate = authenticationRequest.username().contains("@") ?
+                userRepository.findByEmail(authenticationRequest.username())
+                        .orElseThrow(
+                                () -> new BadCredentialsException("Nom d'utilisateur ou mot de passe incorrect.")
+                        ) :
+                userRepository.findByPhone(authenticationRequest.username())
+                        .orElseThrow(
+                                () -> new BadCredentialsException("Nom d'utilisateur ou mot de passe incorrect.")
+                        );
 
         switch (authenticationRequest.platform()) {
             case MOBILE_CONTRIBUTOR -> {
-                if(!userToAuthenticate.getUserRoles().contains(UserRole.ROLE_CONTRIBUTOR)) {
-                    throw new BadCredentialsException("Email ou mot de passe incorrect.");
+                if (!userToAuthenticate.getUserRoles().contains(UserRole.ROLE_CONTRIBUTOR)) {
+                    throw new BadCredentialsException("Nom d'utilisateur ou mot de passe incorrect.");
                 }
             }
             case WEB_ADMIN -> {
-                if(!userToAuthenticate.getUserRoles().contains(UserRole.ROLE_SUPER_ADMIN)
-                && !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_PAYMENTS_ADMIN)
-                && !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_USERS_ADMIN)
-                && !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_VALIDATIONS_ADMIN)
-                && !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_SYSTEM)) {
-                    throw new BadCredentialsException("Email ou mot de passe incorrect.");
+                if (!userToAuthenticate.getUserRoles().contains(UserRole.ROLE_SUPER_ADMIN)
+                        && !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_PAYMENTS_ADMIN)
+                        && !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_USERS_ADMIN)
+                        && !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_VALIDATIONS_ADMIN)
+                        && !userToAuthenticate.getUserRoles().contains(UserRole.ROLE_SYSTEM)) {
+                    throw new BadCredentialsException("Nom d'utilisateur ou mot de passe incorrect.");
                 }
             }
             case WEB_PROJECT_OWNER -> {
-                if(!userToAuthenticate.getUserRoles().contains(UserRole.ROLE_PROJECT_OWNER)) {
-                    throw new BadCredentialsException("Email ou mot de passe incorrect.");
+                if (!userToAuthenticate.getUserRoles().contains(UserRole.ROLE_PROJECT_OWNER)) {
+                    throw new BadCredentialsException("Nom d'utilisateur ou mot de passe incorrect.");
                 }
             }
         }
@@ -79,7 +86,7 @@ public class AuthenticationService {
             storeRefreshToken(userToAuthenticate.getId(), newRefreshToken);
             return new TokenPairResponse(newAccessToken, newRefreshToken);
         }
-        throw new BadCredentialsException("Email ou mot de passe incorrect.");
+        throw new BadCredentialsException("Nom d'utilisateur ou mot de passe incorrect.");
     }
 
     @Transactional

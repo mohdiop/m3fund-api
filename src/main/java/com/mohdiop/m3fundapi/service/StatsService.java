@@ -1,11 +1,10 @@
 package com.mohdiop.m3fundapi.service;
 
 import com.mohdiop.m3fundapi.dto.response.AdminDashboardResponse;
-import com.mohdiop.m3fundapi.entity.Campaign;
+import com.mohdiop.m3fundapi.dto.response.PaymentResponse;
 import com.mohdiop.m3fundapi.entity.Payment;
 import com.mohdiop.m3fundapi.entity.Project;
 import com.mohdiop.m3fundapi.entity.User;
-import com.mohdiop.m3fundapi.entity.enums.CampaignState;
 import com.mohdiop.m3fundapi.entity.enums.UserState;
 import com.mohdiop.m3fundapi.repository.PaymentRepository;
 import com.mohdiop.m3fundapi.repository.ProjectRepository;
@@ -57,8 +56,8 @@ public class StatsService {
                 YearMonth.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth()),
                 u -> ((User) u).getUserCreatedAt()
         );
-        double usersLastMonthScore = lastMonthAverage / (lastMonthStdDev+1);
-        double usersCurrentMonthScore = currentMonthAverage / (currentMonthStdDev+1);
+        double usersLastMonthScore = lastMonthAverage / (lastMonthStdDev + 1);
+        double usersCurrentMonthScore = currentMonthAverage / (currentMonthStdDev + 1);
         var allProjects = projectRepository.findAll();
         Long totalActiveProjects = allProjects.stream()
                 .filter(Project::isValidated)
@@ -83,9 +82,13 @@ public class StatsService {
                 YearMonth.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth()),
                 p -> ((Project) p).getCreatedAt()
         );
-        double projectsLastMonthScore = lastMonthAverage / (lastMonthStdDev+1);
-        double projectsCurrentMonthScore = currentMonthAverage / (currentMonthStdDev+1);
+        double projectsLastMonthScore = lastMonthAverage / (lastMonthStdDev + 1);
+        double projectsCurrentMonthScore = currentMonthAverage / (currentMonthStdDev + 1);
         var allPayments = paymentRepository.findAll().stream().map(Payment::toResponse).toList();
+        double totalFund = 0D;
+        for (PaymentResponse payment : allPayments) {
+            totalFund+=payment.amount();
+        }
 
         return new AdminDashboardResponse(
                 totalActiveUsers,
@@ -96,10 +99,11 @@ public class StatsService {
                 countProjectsCreatedInCurrentMonth(allProjects),
                 projectsCurrentMonthScore,
                 projectsLastMonthScore,
-                0D,
-                0D,
+                totalFund,
+                totalFund,
                 allPayments,
-                allProjects.stream().map(Project::toResponse).toList()
+                allProjects.stream().map(Project::toResponse).toList(),
+                allUsers.stream().map(User::toSimpleResponse).toList()
         );
     }
 

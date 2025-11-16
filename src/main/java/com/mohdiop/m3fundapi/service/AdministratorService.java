@@ -5,6 +5,7 @@ import com.mohdiop.m3fundapi.dto.response.AdministratorResponse;
 import com.mohdiop.m3fundapi.entity.Administrator;
 import com.mohdiop.m3fundapi.entity.enums.UserRole;
 import com.mohdiop.m3fundapi.repository.AdministratorRepository;
+import com.mohdiop.m3fundapi.repository.UserRepository;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +15,11 @@ import java.util.List;
 public class AdministratorService {
 
     private final AdministratorRepository administratorRepository;
+    private final UserRepository userRepository;
 
-    public AdministratorService(AdministratorRepository administratorRepository) {
+    public AdministratorService(AdministratorRepository administratorRepository, UserRepository userRepository) {
         this.administratorRepository = administratorRepository;
+        this.userRepository = userRepository;
     }
 
     public void initializeSuperAdministrator(
@@ -51,10 +54,10 @@ public class AdministratorService {
                 && !createAdministratorRequest.userRoles().contains(UserRole.ROLE_PAYMENTS_ADMIN)) {
             throw new BadRequestException("L'utilisateur doit être un administrateur.");
         }
-        if (administratorRepository.findByEmail(createAdministratorRequest.email()).isPresent()) {
+        if (userRepository.findByEmail(createAdministratorRequest.email()).isPresent()) {
             throw new BadRequestException("Email non valide!");
         }
-        if (administratorRepository.findByPhone(createAdministratorRequest.phone()).isPresent()) {
+        if (userRepository.findByPhone(createAdministratorRequest.phone()).isPresent()) {
             throw new BadRequestException("Téléphone invalide!");
         }
         return administratorRepository.save(

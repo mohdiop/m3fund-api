@@ -1,5 +1,6 @@
 package com.mohdiop.m3fundapi.entity;
 
+import com.mohdiop.m3fundapi.dto.response.SimpleUserResponse;
 import com.mohdiop.m3fundapi.entity.enums.UserRole;
 import com.mohdiop.m3fundapi.entity.enums.UserState;
 import jakarta.persistence.*;
@@ -56,4 +57,11 @@ public abstract class User {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
     private Set<Comment> comments;
+
+    public SimpleUserResponse toSimpleResponse() {
+        return new SimpleUserResponse(
+                id,
+                userCreatedAt
+        );
+    }
 }

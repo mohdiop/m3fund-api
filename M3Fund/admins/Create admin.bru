@@ -6,10 +6,24 @@ meta {
 
 post {
   url: {{baseUrl}}/admins
-  body: none
+  body: json
   auth: inherit
+}
+
+body:json {
+  {
+    "firstName": "Abdoul Ibrahima",
+    "lastName": "Samaké",
+    "phone": "+22379798789",
+    "email": "admin@gmail.com",
+    "userRoles": [
+      "ROLE_VALIDATIONS_ADMIN"
+    ],
+    "password": "Test@1234"
+  }
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }
