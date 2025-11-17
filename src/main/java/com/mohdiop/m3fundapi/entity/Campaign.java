@@ -68,6 +68,9 @@ public class Campaign {
         if(type != CampaignType.VOLUNTEERING) {
             return 0;
         }
+        if(volunteers == null) {
+            return 0;
+        }
         return volunteers.size();
     }
 
