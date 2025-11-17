@@ -89,7 +89,7 @@ public record CreateOrganizationProjectOwnerRequest(
                 .address(address)
                 .annualIncome(annualIncome)
                 .shareCapital(shareCapital)
-                .state(UserState.INACTIVE)
+                .state(UserState.ACTIVE)
                 .userCreatedAt(LocalDateTime.now())
                 .userRoles(new HashSet<>(List.of(UserRole.ROLE_PROJECT_OWNER)))
                 .type(ProjectOwnerType.ORGANIZATION)

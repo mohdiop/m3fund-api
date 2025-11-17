@@ -92,7 +92,7 @@ public record CreateAssociationProjectOwnerRequest(
                 .shareCapital(shareCapital)
                 .userRoles(new HashSet<>(List.of(UserRole.ROLE_PROJECT_OWNER)))
                 .type(ProjectOwnerType.ASSOCIATION)
-                .state(UserState.INACTIVE)
+                .state(UserState.ACTIVE)
                 .userCreatedAt(LocalDateTime.now())
                 .build();
     }

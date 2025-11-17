@@ -85,7 +85,7 @@ public record CreateIndividualProjectOwnerRequest(
                 .annualIncome(annualIncome)
                 .userRoles(new HashSet<>(List.of(UserRole.ROLE_PROJECT_OWNER)))
                 .type(ProjectOwnerType.INDIVIDUAL)
-                .state(UserState.INACTIVE)
+                .state(UserState.ACTIVE)
                 .userCreatedAt(LocalDateTime.now())
                 .build();
     }
