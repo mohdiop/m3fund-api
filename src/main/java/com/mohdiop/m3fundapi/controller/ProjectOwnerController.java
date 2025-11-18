@@ -4,6 +4,7 @@ import com.mohdiop.m3fundapi.dto.request.update.UpdateIndividualProjectOwnerRequ
 import com.mohdiop.m3fundapi.dto.response.IndividualProjectOwnerResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
 import com.mohdiop.m3fundapi.service.ProjectOwnerService;
+import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,7 +27,7 @@ public class ProjectOwnerController {
     @PreAuthorize("hasRole('PROJECT_OWNER')")
     @PatchMapping
     public ResponseEntity<IndividualProjectOwnerResponse> updateIndividualProjectOwner(
-            UpdateIndividualProjectOwnerRequest updateIndividualProjectOwnerRequest
+            @Valid UpdateIndividualProjectOwnerRequest updateIndividualProjectOwnerRequest
     ) throws BadRequestException {
         return ResponseEntity.ok(
                 projectOwnerService.updateIndividualProjectOwner(

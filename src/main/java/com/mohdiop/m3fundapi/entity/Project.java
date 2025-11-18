@@ -48,7 +48,7 @@ public class Project {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "project_images",
             joinColumns = @JoinColumn(name = "project_id", nullable = false),

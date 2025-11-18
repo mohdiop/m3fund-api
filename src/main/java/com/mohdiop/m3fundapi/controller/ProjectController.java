@@ -69,8 +69,8 @@ public class ProjectController {
     @PreAuthorize("hasRole('PROJECT_OWNER')")
     @PatchMapping("/{id}")
     public ResponseEntity<ProjectResponse> updateProject(
-            @PathVariable Long id,
-            @Valid UpdateProjectRequest updateProjectRequest
+            UpdateProjectRequest updateProjectRequest,
+            @PathVariable Long id
     ) {
         return ResponseEntity.ok(
                 projectService.updateProject(

@@ -17,6 +17,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -103,6 +104,7 @@ public class ProjectService {
         return allProjects.stream().map(Project::toOwnerProjectResponse).toList();
     }
 
+    @Transactional
     public ProjectResponse updateProject(
             Long projectId,
             UpdateProjectRequest request,
@@ -128,6 +130,7 @@ public class ProjectService {
 
         if (request.images() != null && !request.images().isEmpty()) {
             project.getImages().clear();
+            project = projectRepository.save(project);
             project.setImages(
                     request.images().stream().map(
                             (i) -> uploadService.uploadFile(
