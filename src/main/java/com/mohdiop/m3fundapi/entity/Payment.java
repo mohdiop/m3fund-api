@@ -2,6 +2,7 @@ package com.mohdiop.m3fundapi.entity;
 
 import com.mohdiop.m3fundapi.dto.response.PaymentResponse;
 import com.mohdiop.m3fundapi.entity.enums.PaymentState;
+import com.mohdiop.m3fundapi.entity.enums.PaymentStrategy;
 import com.mohdiop.m3fundapi.entity.enums.PaymentType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,6 +39,10 @@ public class Payment {
     @Column(nullable = false)
     private double amount;
 
+    @Column(nullable = false, columnDefinition = "ENUM('CASHED', 'DISBURSED') DEFAULT 'CASHED'")
+    @Enumerated(EnumType.STRING)
+    private PaymentStrategy strategy;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "payment")
     private Gift gift;
 
@@ -52,7 +57,8 @@ public class Payment {
                 state,
                 carriedOutOn,
                 amount,
-                gift == null ? capitalPurchase == null ? "" : capitalPurchase.getCampaign().getProject().getName() : gift.getCampaign().getProject().getName()
+                gift == null ? capitalPurchase == null ? "" : capitalPurchase.getCampaign().getProject().getName() : gift.getCampaign().getProject().getName(),
+                strategy
         );
     }
 }

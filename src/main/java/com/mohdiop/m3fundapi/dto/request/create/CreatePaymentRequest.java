@@ -2,6 +2,7 @@ package com.mohdiop.m3fundapi.dto.request.create;
 
 import com.mohdiop.m3fundapi.entity.Payment;
 import com.mohdiop.m3fundapi.entity.enums.PaymentState;
+import com.mohdiop.m3fundapi.entity.enums.PaymentStrategy;
 import com.mohdiop.m3fundapi.entity.enums.PaymentType;
 import jakarta.validation.constraints.*;
 
@@ -33,6 +34,7 @@ public record CreatePaymentRequest(
                 .state(state)
                 .carriedOutOn(LocalDateTime.now())
                 .amount(amount)
+                .strategy(PaymentStrategy.CASHED)
                 .build();
     }
 }

@@ -1,6 +1,7 @@
 package com.mohdiop.m3fundapi.dto.response;
 
 import com.mohdiop.m3fundapi.entity.enums.PaymentState;
+import com.mohdiop.m3fundapi.entity.enums.PaymentStrategy;
 import com.mohdiop.m3fundapi.entity.enums.PaymentType;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ public record PaymentResponse(
         PaymentState state,
         LocalDateTime madeAt,
         double amount,
-        String projectName
+        String projectName,
+        PaymentStrategy strategy
 ) {
 }
