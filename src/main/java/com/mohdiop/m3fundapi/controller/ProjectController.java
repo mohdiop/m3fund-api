@@ -70,7 +70,7 @@ public class ProjectController {
     @PatchMapping("/{id}")
     public ResponseEntity<ProjectResponse> updateProject(
             @PathVariable Long id,
-            @Valid @RequestBody UpdateProjectRequest updateProjectRequest
+            @Valid UpdateProjectRequest updateProjectRequest
     ) {
         return ResponseEntity.ok(
                 projectService.updateProject(
