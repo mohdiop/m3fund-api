@@ -1,11 +1,11 @@
 meta {
-  name: test
+  name: Validate project owner
   type: http
-  seq: 9
+  seq: 1
 }
 
-get {
-  url: https://m3fund-api.onrender.com/api/v1/public/keep-alive
+post {
+  url: {{baseUrl}}/validations/owners/41
   body: none
   auth: inherit
 }

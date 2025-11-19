@@ -8,15 +8,20 @@ import com.mohdiop.m3fundapi.dto.response.AssociationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.IndividualProjectOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.OrganizationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.entity.ProjectOwner;
+import com.mohdiop.m3fundapi.entity.ValidationRequest;
 import com.mohdiop.m3fundapi.entity.enums.FileType;
 import com.mohdiop.m3fundapi.entity.enums.ProjectOwnerType;
+import com.mohdiop.m3fundapi.entity.enums.ValidationState;
 import com.mohdiop.m3fundapi.repository.ProjectOwnerRepository;
 import com.mohdiop.m3fundapi.repository.UserRepository;
+import com.mohdiop.m3fundapi.repository.ValidationRequestRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -24,17 +29,20 @@ public class ProjectOwnerService {
 
     private final ProjectOwnerRepository projectOwnerRepository;
     private final UserRepository userRepository;
+    private final ValidationRequestRepository validationRequestRepository;
 
     private final UploadService uploadService;
     private final EmailService emailService;
 
-    public ProjectOwnerService(ProjectOwnerRepository projectOwnerRepository, UserRepository userRepository, UploadService uploadService, EmailService emailService) {
+    public ProjectOwnerService(ProjectOwnerRepository projectOwnerRepository, UserRepository userRepository, ValidationRequestRepository validationRequestRepository, UploadService uploadService, EmailService emailService) {
         this.projectOwnerRepository = projectOwnerRepository;
         this.userRepository = userRepository;
+        this.validationRequestRepository = validationRequestRepository;
         this.uploadService = uploadService;
         this.emailService = emailService;
     }
 
+    @Transactional
     public IndividualProjectOwnerResponse createIndividualProjectOwner(
             CreateIndividualProjectOwnerRequest createIndividualProjectOwnerRequest
     ) throws BadRequestException {
@@ -95,9 +103,18 @@ public class ProjectOwnerService {
         }
         ProjectOwner projectOwnerToReturn = projectOwnerRepository.save(projectOwner);
         sendPendingCreationEmail(projectOwnerToReturn.getEmail());
+        validationRequestRepository.save(
+                ValidationRequest.builder()
+                        .id(null)
+                        .owner(projectOwnerToReturn)
+                        .date(LocalDateTime.now())
+                        .state(ValidationState.PENDING)
+                        .build()
+        );
         return projectOwnerToReturn.toIndividualResponse();
     }
 
+    @Transactional
     public AssociationProjectOwnerResponse createAssociationProjectOwner(
             CreateAssociationProjectOwnerRequest createAssociationProjectOwnerRequest
     ) throws BadRequestException {
@@ -146,9 +163,18 @@ public class ProjectOwnerService {
         }
         ProjectOwner projectOwnerToReturn = projectOwnerRepository.save(projectOwner);
         sendPendingCreationEmail(projectOwnerToReturn.getEmail());
+        validationRequestRepository.save(
+                ValidationRequest.builder()
+                        .id(null)
+                        .owner(projectOwnerToReturn)
+                        .date(LocalDateTime.now())
+                        .state(ValidationState.PENDING)
+                        .build()
+        );
         return projectOwnerToReturn.toAssociationResponse();
     }
 
+    @Transactional
     public OrganizationProjectOwnerResponse createOrganization(
             CreateOrganizationProjectOwnerRequest createOrganizationProjectOwnerRequest
     ) throws BadRequestException {
@@ -197,6 +223,14 @@ public class ProjectOwnerService {
         }
         ProjectOwner projectOwnerToReturn = projectOwnerRepository.save(projectOwner);
         sendPendingCreationEmail(projectOwnerToReturn.getEmail());
+        validationRequestRepository.save(
+                ValidationRequest.builder()
+                        .id(null)
+                        .owner(projectOwnerToReturn)
+                        .date(LocalDateTime.now())
+                        .state(ValidationState.PENDING)
+                        .build()
+        );
         return projectOwnerToReturn.toOrganizationResponse();
     }
 
@@ -207,8 +241,8 @@ public class ProjectOwnerService {
                 recipientEmail,
                 "Création de compte",
                 """
-                        Bonjour, nous procédons à la vérification de vos informations pour la création de votre compte.\
-                        Un mail vous sera envoyé prochainement sous 48h pour vous informer de l'état.\
+                        Bonjour, nous procédons à la vérification de vos informations pour la création de votre compte.
+                        Un mail vous sera envoyé prochainement sous 48h pour vous informer de l'état.
                         Merci de bien vouloir patienter, l'équipe de M3Fund.
                         """
         );

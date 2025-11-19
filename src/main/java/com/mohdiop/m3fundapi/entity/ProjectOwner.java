@@ -141,6 +141,9 @@ public class ProjectOwner extends User {
         return new SimpleOwnerResponse(
                 getId(),
                 name,
+                getEmail(),
+                getPhone(),
+                type,
                 (profilePicture != null) ? profilePicture.getUrl() : null
         );
     }

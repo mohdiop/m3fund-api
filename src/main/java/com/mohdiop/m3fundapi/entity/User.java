@@ -61,6 +61,8 @@ public abstract class User {
     public SimpleUserResponse toSimpleResponse() {
         return new SimpleUserResponse(
                 id,
+                state,
+                userRoles,
                 userCreatedAt
         );
     }
