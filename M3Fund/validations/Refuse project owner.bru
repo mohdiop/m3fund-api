@@ -1,11 +1,11 @@
 meta {
-  name: Validate project owner
+  name: Refuse project owner
   type: http
-  seq: 1
+  seq: 3
 }
 
 post {
-  url: {{baseUrl}}/validations/owners/40/validate
+  url: {{baseUrl}}/validations/owners/40/refuse
   body: none
   auth: inherit
 }

@@ -1,0 +1,15 @@
+meta {
+  name: Get all pending validations
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/validations/owners
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

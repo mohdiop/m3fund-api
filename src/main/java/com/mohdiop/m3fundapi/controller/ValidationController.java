@@ -6,10 +6,9 @@ import com.mohdiop.m3fundapi.service.ValidationRequestService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/validations")
@@ -24,7 +23,7 @@ public class ValidationController {
     }
 
     @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
-    @PostMapping("/owners/{ownerId}")
+    @PostMapping("/owners/{ownerId}/validate")
     public ResponseEntity<ValidationRequestResponse> validateOwner(
             @PathVariable Long ownerId
     ) throws BadRequestException {
@@ -33,6 +32,27 @@ public class ValidationController {
                         authenticationService.getCurrentUserId(),
                         ownerId
                 )
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
+    @PostMapping("/owners/{ownerId}/refuse")
+    public ResponseEntity<ValidationRequestResponse> refuseValidation(
+            @PathVariable Long ownerId
+    ) throws BadRequestException {
+        return ResponseEntity.ok(
+                validationRequestService.refuseValidation(
+                        authenticationService.getCurrentUserId(),
+                        ownerId
+                )
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
+    @GetMapping("/owners")
+    public ResponseEntity<List<ValidationRequestResponse>> getAllPendingValidations() {
+        return ResponseEntity.ok(
+                validationRequestService.getAllPendingValidations()
         );
     }
 }
