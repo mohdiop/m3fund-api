@@ -2,6 +2,7 @@ package com.mohdiop.m3fundapi.service;
 
 import com.mohdiop.m3fundapi.dto.response.AdminDashboardResponse;
 import com.mohdiop.m3fundapi.dto.response.PaymentResponse;
+import com.mohdiop.m3fundapi.dto.response.StaticWebsiteStatsResponse;
 import com.mohdiop.m3fundapi.entity.Payment;
 import com.mohdiop.m3fundapi.entity.Project;
 import com.mohdiop.m3fundapi.entity.User;
@@ -177,5 +178,19 @@ public class StatsService {
         return Math.sqrt(variance);
     }
 
+    public StaticWebsiteStatsResponse getWebsiteStats() {
+        var totalUsers = userRepository.count();
+        var allPayments = paymentRepository.findAll();
+
+        var totalPaymentAmount = 0D;
+
+        for (Payment payment : allPayments) {
+            totalPaymentAmount+=payment.getAmount();
+        }
+        return new StaticWebsiteStatsResponse(
+                totalUsers,
+                totalPaymentAmount
+        );
+    }
 
 }

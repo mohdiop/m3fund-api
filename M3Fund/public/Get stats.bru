@@ -1,0 +1,15 @@
+meta {
+  name: Get stats
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/public/stats
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

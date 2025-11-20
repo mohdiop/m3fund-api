@@ -339,4 +339,26 @@ public class ProjectOwnerService {
         }
         return projectOwnerRepository.save(projectOwner).toIndividualResponse();
     }
+
+    public Record getById(
+            Long ownerId
+    ) {
+        var owner = projectOwnerRepository.findById(ownerId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Utilisateur introuvable.")
+                );
+
+        switch (owner.getType()) {
+            case INDIVIDUAL -> {
+                return owner.toIndividualResponse();
+            }
+            case ORGANIZATION -> {
+                return owner.toOrganizationResponse();
+            }
+            case ASSOCIATION -> {
+                return owner.toAssociationResponse();
+            }
+        }
+        throw new RuntimeException("Un problème inconnu est survenu");
+    }
 }

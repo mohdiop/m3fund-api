@@ -8,9 +8,7 @@ import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/project-owners")
@@ -34,6 +32,16 @@ public class ProjectOwnerController {
                         authenticationService.getCurrentUserId(),
                         updateIndividualProjectOwnerRequest
                 )
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'USERS_ADMIN', 'VALIDATIONS_ADMIN', 'SYSTEM')")
+    @GetMapping("/{ownerId}")
+    public ResponseEntity<Record> getById(
+            @PathVariable Long ownerId
+    ) {
+        return ResponseEntity.ok(
+                projectOwnerService.getById(ownerId)
         );
     }
 }

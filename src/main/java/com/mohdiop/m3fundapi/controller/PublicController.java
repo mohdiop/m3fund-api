@@ -3,10 +3,8 @@ package com.mohdiop.m3fundapi.controller;
 import com.mohdiop.m3fundapi.dto.request.CheckForEmailAndPhoneValidityRequest;
 import com.mohdiop.m3fundapi.dto.response.CampaignResponse;
 import com.mohdiop.m3fundapi.dto.response.OwnerProjectResponse;
-import com.mohdiop.m3fundapi.service.CampaignService;
-import com.mohdiop.m3fundapi.service.DownloadService;
-import com.mohdiop.m3fundapi.service.ProjectService;
-import com.mohdiop.m3fundapi.service.UserService;
+import com.mohdiop.m3fundapi.dto.response.StaticWebsiteStatsResponse;
+import com.mohdiop.m3fundapi.service.*;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.core.io.Resource;
@@ -23,12 +21,14 @@ public class PublicController {
     private final CampaignService campaignService;
     private final UserService userService;
     private final DownloadService downloadService;
+    private final StatsService statsService;
 
-    public PublicController(ProjectService projectService, CampaignService campaignService, UserService userService, DownloadService downloadService) {
+    public PublicController(ProjectService projectService, CampaignService campaignService, UserService userService, DownloadService downloadService, StatsService statsService) {
         this.projectService = projectService;
         this.campaignService = campaignService;
         this.userService = userService;
         this.downloadService = downloadService;
+        this.statsService = statsService;
     }
 
     @GetMapping("/projects")
@@ -65,5 +65,12 @@ public class PublicController {
             @RequestParam(name = "absolutePath") String absolutePath
     ) {
         return downloadService.downloadByPath(absolutePath);
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<StaticWebsiteStatsResponse> getWebsiteStats() {
+        return ResponseEntity.ok(
+                statsService.getWebsiteStats()
+        );
     }
 }
