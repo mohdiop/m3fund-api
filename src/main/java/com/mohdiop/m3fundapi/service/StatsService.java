@@ -6,6 +6,7 @@ import com.mohdiop.m3fundapi.dto.response.StaticWebsiteStatsResponse;
 import com.mohdiop.m3fundapi.entity.Payment;
 import com.mohdiop.m3fundapi.entity.Project;
 import com.mohdiop.m3fundapi.entity.User;
+import com.mohdiop.m3fundapi.entity.enums.PaymentStrategy;
 import com.mohdiop.m3fundapi.entity.enums.UserState;
 import com.mohdiop.m3fundapi.repository.PaymentRepository;
 import com.mohdiop.m3fundapi.repository.ProjectRepository;
@@ -90,6 +91,18 @@ public class StatsService {
         for (PaymentResponse payment : allPayments) {
             totalFund+=payment.amount();
         }
+        var cashedPayments = allPayments.stream().filter(paymentResponse -> paymentResponse.strategy() == PaymentStrategy.CASHED).toList();
+        var disbursedPayments = allPayments.stream().filter(paymentResponse -> paymentResponse.strategy() == PaymentStrategy.DISBURSED).toList();
+
+        double totalCashed = 0D;
+        for (PaymentResponse payment : cashedPayments) {
+            totalCashed += payment.amount();
+        }
+
+        double totalDisbursed = 0D;
+        for (PaymentResponse payment : disbursedPayments) {
+            totalDisbursed += payment.amount();
+        }
 
         return new AdminDashboardResponse(
                 totalActiveUsers,
@@ -100,7 +113,7 @@ public class StatsService {
                 countProjectsCreatedInCurrentMonth(allProjects),
                 projectsCurrentMonthScore,
                 projectsLastMonthScore,
-                totalFund,
+                totalCashed - totalDisbursed,
                 totalFund,
                 allPayments,
                 allProjects.stream().map(Project::toResponse).toList(),

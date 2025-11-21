@@ -14,6 +14,7 @@ public record OrganizationProjectOwnerResponse(
         String phone,
         String address,
         double annualIncome,
+        double shareCapital,
         String logoUrl,
         String rccmUrl,
         String bankStatementUrl,

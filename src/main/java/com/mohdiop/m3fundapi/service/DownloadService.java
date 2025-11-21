@@ -21,9 +21,20 @@ public class DownloadService {
 
         Resource resource = new FileSystemResource(file);
 
+        String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        try {
+            contentType = java.nio.file.Files.probeContentType(file.toPath());
+        } catch (Exception ignored) {}
+
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                .contentType(MediaType.parseMediaType(contentType))
                 .contentLength(file.length())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getName() + "\"")
                 .body(resource);
     }
+
 }

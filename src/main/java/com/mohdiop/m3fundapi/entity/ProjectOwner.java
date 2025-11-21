@@ -121,6 +121,7 @@ public class ProjectOwner extends User {
                 getPhone(),
                 address,
                 annualIncome,
+                shareCapital,
                 (profilePicture != null) ? profilePicture.getUrl() : null,
                 rccm.getUrl(),
                 bankStatement.getUrl(),
