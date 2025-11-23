@@ -57,7 +57,7 @@ public class CampaignService {
             throw new AccessDeniedException("Accès réfusé.");
         }
         var userCampaigns = campaignRepository.findByProjectOwnerId(ownerId);
-        if(!canCreateCampaignThisWeek(userCampaigns, LocalDateTime.now())) {
+        if (!canCreateCampaignThisWeek(userCampaigns, LocalDateTime.now())) {
             throw new BadRequestException("Vous ne pouvez créer plus de 2 campagnes par semaine.");
         }
         Campaign campaign;
@@ -313,11 +313,15 @@ public class CampaignService {
                 campaignRepository.save(campaign);
                 sendCampaignFinishedNotification(campaign.getProjectOwner().getId(), campaign.getProject().getName());
                 switch (campaign.getType()) {
-                    case INVESTMENT -> sendCampaignFinishedNotificationToContributors(
-                            new ArrayList<>(
-                                    Collections.singleton(campaign.getCapitalPurchase().getContributor())
-                            ), campaign.getProject().getName()
-                    );
+                    case INVESTMENT -> {
+                        if (campaign.getCapitalPurchase() != null) {
+                            sendCampaignFinishedNotificationToContributors(
+                                    new ArrayList<>(
+                                            Collections.singleton(campaign.getCapitalPurchase().getContributor())
+                                    ), campaign.getProject().getName()
+                            );
+                        }
+                    }
                     case VOLUNTEERING -> sendCampaignFinishedNotificationToContributors(
                             campaign.getVolunteers().stream().map(Volunteer::getContributor).collect(Collectors.toSet()).stream().toList(),
                             campaign.getProject().getName()
@@ -394,7 +398,8 @@ public class CampaignService {
 
     /**
      * Vérifie si une nouvelle campagne peut être créée cette semaine
-     * @param campaigns la liste des campagnes existantes
+     *
+     * @param campaigns   la liste des campagnes existantes
      * @param dateToCheck la date à laquelle on veut créer la campagne (ex: maintenant)
      * @return true si moins de 2 campagnes sont déjà créées cette semaine, false sinon
      */
