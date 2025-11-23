@@ -8,17 +8,18 @@ import com.mohdiop.m3fundapi.dto.response.ProjectsStatsResponse;
 import com.mohdiop.m3fundapi.entity.File;
 import com.mohdiop.m3fundapi.entity.Project;
 import com.mohdiop.m3fundapi.entity.ProjectOwner;
-import com.mohdiop.m3fundapi.entity.enums.CampaignState;
-import com.mohdiop.m3fundapi.entity.enums.FileType;
-import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
+import com.mohdiop.m3fundapi.entity.ValidationRequest;
+import com.mohdiop.m3fundapi.entity.enums.*;
 import com.mohdiop.m3fundapi.repository.ProjectOwnerRepository;
 import com.mohdiop.m3fundapi.repository.ProjectRepository;
+import com.mohdiop.m3fundapi.repository.ValidationRequestRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,13 +30,16 @@ public class ProjectService {
 
     private final UploadService uploadService;
     private final ProjectOwnerRepository projectOwnerRepository;
+    private final ValidationRequestRepository validationRequestRepository;
 
-    public ProjectService(ProjectRepository projectRepository, UploadService uploadService, ProjectOwnerRepository projectOwnerRepository) {
+    public ProjectService(ProjectRepository projectRepository, UploadService uploadService, ProjectOwnerRepository projectOwnerRepository, ValidationRequestRepository validationRequestRepository) {
         this.projectRepository = projectRepository;
         this.uploadService = uploadService;
         this.projectOwnerRepository = projectOwnerRepository;
+        this.validationRequestRepository = validationRequestRepository;
     }
 
+    @Transactional
     public ProjectResponse createProject(
             Long ownerId,
             CreateProjectRequest createProjectRequest
@@ -82,7 +86,17 @@ public class ProjectService {
                     )
             );
         }
-        return projectRepository.save(project).toResponse();
+        var projectResponse = projectRepository.save(project);
+        validationRequestRepository.save(
+                ValidationRequest.builder()
+                        .id(null)
+                        .project(projectResponse)
+                        .state(ValidationState.PENDING)
+                        .date(LocalDateTime.now())
+                        .entity(EntityName.PROJECT)
+                        .build()
+        );
+        return projectResponse.toResponse();
     }
 
     public OwnerProjectResponse validateProject(

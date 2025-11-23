@@ -1,6 +1,7 @@
 package com.mohdiop.m3fundapi.controller;
 
-import com.mohdiop.m3fundapi.dto.response.ValidationRequestResponse;
+import com.mohdiop.m3fundapi.dto.response.ValidationRequestOwnerResponse;
+import com.mohdiop.m3fundapi.dto.response.ValidationRequestProjectResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
 import com.mohdiop.m3fundapi.service.ValidationRequestService;
 import org.apache.coyote.BadRequestException;
@@ -24,7 +25,7 @@ public class ValidationController {
 
     @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
     @PostMapping("/owners/{ownerId}/validate")
-    public ResponseEntity<ValidationRequestResponse> validateOwner(
+    public ResponseEntity<ValidationRequestOwnerResponse> validateOwner(
             @PathVariable Long ownerId
     ) throws BadRequestException {
         return ResponseEntity.ok(
@@ -37,11 +38,11 @@ public class ValidationController {
 
     @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
     @PostMapping("/owners/{ownerId}/refuse")
-    public ResponseEntity<ValidationRequestResponse> refuseValidation(
+    public ResponseEntity<ValidationRequestOwnerResponse> refuseValidation(
             @PathVariable Long ownerId
     ) throws BadRequestException {
         return ResponseEntity.ok(
-                validationRequestService.refuseValidation(
+                validationRequestService.refuseOwner(
                         authenticationService.getCurrentUserId(),
                         ownerId
                 )
@@ -49,10 +50,44 @@ public class ValidationController {
     }
 
     @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
-    @GetMapping("/owners")
-    public ResponseEntity<List<ValidationRequestResponse>> getAllPendingValidations() {
+    @PostMapping("/projects/{projectId}/validate")
+    public ResponseEntity<ValidationRequestProjectResponse> validateProject(
+            @PathVariable Long projectId
+    ) throws BadRequestException {
         return ResponseEntity.ok(
-                validationRequestService.getAllPendingValidations()
+                validationRequestService.validateProject(
+                        authenticationService.getCurrentUserId(),
+                        projectId
+                )
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
+    @PostMapping("/projects/{projectId}/refuse")
+    public ResponseEntity<ValidationRequestProjectResponse> refuseProject(
+            @PathVariable Long projectId
+    ) throws BadRequestException {
+        return ResponseEntity.ok(
+                validationRequestService.refuseProject(
+                        authenticationService.getCurrentUserId(),
+                        projectId
+                )
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
+    @GetMapping("/owners")
+    public ResponseEntity<List<ValidationRequestOwnerResponse>> getAllPendingOwnersValidations() {
+        return ResponseEntity.ok(
+                validationRequestService.getAllPendingOwnersValidations()
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
+    @GetMapping("/projects")
+    public ResponseEntity<List<ValidationRequestProjectResponse>> getAllPendingProjectsValidations() {
+        return ResponseEntity.ok(
+                validationRequestService.getAllPendingProjectsValidations()
         );
     }
 }

@@ -4,10 +4,11 @@ import com.mohdiop.m3fundapi.entity.enums.ValidationState;
 
 import java.time.LocalDateTime;
 
-public record ValidationRequestResponse (
+public record ValidationRequestProjectResponse(
         Long id,
-        SimpleOwnerResponse owner,
+        ProjectResponse project,
         LocalDateTime date,
-        ValidationState state
-)
-{}
+        ValidationState state,
+        String ownerName
+) {
+}

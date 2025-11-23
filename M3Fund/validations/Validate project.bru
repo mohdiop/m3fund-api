@@ -1,0 +1,15 @@
+meta {
+  name: Validate project
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/validations/projects/7/validate
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Get all pending projects validations
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/validations/projects
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

@@ -9,6 +9,7 @@ import com.mohdiop.m3fundapi.dto.response.IndividualProjectOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.OrganizationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.entity.ProjectOwner;
 import com.mohdiop.m3fundapi.entity.ValidationRequest;
+import com.mohdiop.m3fundapi.entity.enums.EntityName;
 import com.mohdiop.m3fundapi.entity.enums.FileType;
 import com.mohdiop.m3fundapi.entity.enums.ProjectOwnerType;
 import com.mohdiop.m3fundapi.entity.enums.ValidationState;
@@ -109,6 +110,7 @@ public class ProjectOwnerService {
                         .owner(projectOwnerToReturn)
                         .date(LocalDateTime.now())
                         .state(ValidationState.PENDING)
+                        .entity(EntityName.USER)
                         .build()
         );
         return projectOwnerToReturn.toIndividualResponse();
