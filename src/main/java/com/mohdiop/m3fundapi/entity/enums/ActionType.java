@@ -5,5 +5,6 @@ public enum ActionType {
     INACTIVATION,
     ACTIVATION,
     VALIDATION,
-    REFUSAL
+    REFUSAL,
+    DISBURSING
 }

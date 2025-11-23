@@ -48,7 +48,7 @@ public class UserService {
     public void checkForEmailAndPhoneValidity(
             CheckForEmailAndPhoneValidityRequest checkRequest
     ) throws BadRequestException {
-        if(checkRequest.email() != null) {
+        if (checkRequest.email() != null) {
             if (userRepository.findByEmail(checkRequest.email()).isPresent()) {
                 throw new BadRequestException("Email indisponible, choisissez un autre.");
             }

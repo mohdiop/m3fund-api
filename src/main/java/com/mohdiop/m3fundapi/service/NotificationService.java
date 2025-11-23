@@ -21,7 +21,7 @@ public class NotificationService {
             Long userId
     ) {
         var notifications = notificationRepository.findByToUserId(userId);
-        if(notifications.isEmpty()) return new ArrayList<>();
+        if (notifications.isEmpty()) return new ArrayList<>();
         return notifications.stream().map(Notification::toResponse).toList();
     }
 }

@@ -12,8 +12,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableScheduling
 public class M3FundApiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(M3FundApiApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(M3FundApiApplication.class, args);
+    }
 
 }

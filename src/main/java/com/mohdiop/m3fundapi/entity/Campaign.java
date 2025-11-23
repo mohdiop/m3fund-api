@@ -55,6 +55,9 @@ public class Campaign {
     @Enumerated(EnumType.STRING)
     private CampaignState state;
 
+    @Column(nullable = false, columnDefinition = "BOOL DEFAULT FALSE")
+    private boolean isDisbursed;
+
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Reward> rewards;
 
@@ -65,10 +68,10 @@ public class Campaign {
     private Set<Volunteer> volunteers;
 
     public int getCurrentVolunteerNumber() {
-        if(type != CampaignType.VOLUNTEERING) {
+        if (type != CampaignType.VOLUNTEERING) {
             return 0;
         }
-        if(volunteers == null) {
+        if (volunteers == null) {
             return 0;
         }
         return volunteers.size();
@@ -76,8 +79,8 @@ public class Campaign {
 
     public CampaignResponse toResponse() {
         double currentFund = 0D;
-        if(type == CampaignType.DONATION && gifts != null) {
-            for(var gift: gifts) {
+        if (type == CampaignType.DONATION && gifts != null) {
+            for (var gift : gifts) {
                 currentFund += gift.getPayment().getAmount();
             }
         }

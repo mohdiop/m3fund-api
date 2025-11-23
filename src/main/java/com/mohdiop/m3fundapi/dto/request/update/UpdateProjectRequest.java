@@ -1,8 +1,6 @@
 package com.mohdiop.m3fundapi.dto.request.update;
 
 import com.mohdiop.m3fundapi.annotation.FileContentType;
-import com.mohdiop.m3fundapi.annotation.FileNotEmpty;
-import com.mohdiop.m3fundapi.annotation.ValidFileList;
 import com.mohdiop.m3fundapi.annotation.ValidFileListForPatch;
 import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
 import jakarta.validation.constraints.PastOrPresent;

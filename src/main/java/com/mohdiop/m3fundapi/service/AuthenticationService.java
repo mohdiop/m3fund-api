@@ -73,7 +73,7 @@ public class AuthenticationService {
 
         if (BCrypt.checkpw(authenticationRequest.password(), userToAuthenticate.getPassword())) {
             if (userToAuthenticate.getState() == UserState.SUSPENDED
-            || userToAuthenticate.getState() == UserState.INACTIVE) {
+                    || userToAuthenticate.getState() == UserState.INACTIVE) {
                 throw new AccessDeniedException("Votre compte est suspendu ou inactif.");
             }
             String newAccessToken = jwtService.generateAccessToken(

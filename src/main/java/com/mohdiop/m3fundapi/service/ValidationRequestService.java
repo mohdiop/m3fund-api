@@ -171,7 +171,7 @@ public class ValidationRequestService {
         if (validation.getState() == ValidationState.APPROVED && project.isValidated()) {
             throw new BadRequestException("Projet déjà validé.");
         }
-        if(validation.getState() == ValidationState.REFUSED && !project.isValidated()) {
+        if (validation.getState() == ValidationState.REFUSED && !project.isValidated()) {
             throw new BadRequestException("Projet déjà réfusé.");
         }
         project.setValidated(false);

@@ -11,10 +11,13 @@ import com.mohdiop.m3fundapi.entity.enums.NotificationType;
 import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
 import com.mohdiop.m3fundapi.repository.*;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,7 +44,7 @@ public class CampaignService {
             Long ownerId,
             Long projectId,
             CreateCampaignRequest createCampaignRequest
-    ) throws AccessDeniedException {
+    ) throws AccessDeniedException, BadRequestException {
         ProjectOwner owner = projectOwnerRepository.findById(ownerId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Porteur introuvable.")
@@ -52,6 +55,10 @@ public class CampaignService {
                 );
         if (!Objects.equals(project.getOwner().getId(), owner.getId())) {
             throw new AccessDeniedException("Accès réfusé.");
+        }
+        var userCampaigns = campaignRepository.findByProjectOwnerId(ownerId);
+        if(!canCreateCampaignThisWeek(userCampaigns, LocalDateTime.now())) {
+            throw new BadRequestException("Vous ne pouvez créer plus de 2 campagnes par semaine.");
         }
         Campaign campaign;
         switch (createCampaignRequest.type()) {
@@ -263,6 +270,41 @@ public class CampaignService {
         return stats;
     }
 
+    @Transactional
+    public CampaignResponse finishCampaign(
+            Long authorId,
+            Long campaignId
+    ) throws BadRequestException {
+        var campaign = campaignRepository.findById(campaignId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Campagne introuvable.")
+                );
+        if (!Objects.equals(campaign.getProjectOwner().getId(), authorId)) {
+            throw new AccessDeniedException("Accès interdit à cette ressource");
+        }
+        if (campaign.getState() == CampaignState.FINISHED) {
+            throw new BadRequestException("Cette campagne est déjà terminée.");
+        }
+        campaign.setState(CampaignState.FINISHED);
+        campaign.setEndAt(LocalDateTime.now());
+        switch (campaign.getType()) {
+            case INVESTMENT -> sendCampaignFinishedNotificationToContributors(
+                    new ArrayList<>(
+                            Collections.singleton(campaign.getCapitalPurchase().getContributor())
+                    ), campaign.getProject().getName()
+            );
+            case VOLUNTEERING -> sendCampaignFinishedNotificationToContributors(
+                    campaign.getVolunteers().stream().map(Volunteer::getContributor).collect(Collectors.toSet()).stream().toList(),
+                    campaign.getProject().getName()
+            );
+            case DONATION -> sendCampaignFinishedNotificationToContributors(
+                    campaign.getGifts().stream().map(Gift::getContributor).collect(Collectors.toSet()).stream().toList(),
+                    campaign.getProject().getName()
+            );
+        }
+        return campaignRepository.save(campaign).toResponse();
+    }
+
     public void finishCampaigns() {
         var allCampaigns = campaignRepository.findByState(CampaignState.IN_PROGRESS);
         for (Campaign campaign : allCampaigns) {
@@ -348,6 +390,29 @@ public class CampaignService {
                                 )
                 ).collect(Collectors.toSet())
         );
+    }
+
+    /**
+     * Vérifie si une nouvelle campagne peut être créée cette semaine
+     * @param campaigns la liste des campagnes existantes
+     * @param dateToCheck la date à laquelle on veut créer la campagne (ex: maintenant)
+     * @return true si moins de 2 campagnes sont déjà créées cette semaine, false sinon
+     */
+    private boolean canCreateCampaignThisWeek(List<Campaign> campaigns, LocalDateTime dateToCheck) {
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        int weekNumber = dateToCheck.get(weekFields.weekOfWeekBasedYear());
+        int year = dateToCheck.getYear();
+
+        long countThisWeek = campaigns.stream()
+                .filter(c -> {
+                    LocalDateTime launch = c.getLaunchedAt();
+                    int campaignWeek = launch.get(weekFields.weekOfWeekBasedYear());
+                    int campaignYear = launch.getYear();
+                    return campaignWeek == weekNumber && campaignYear == year;
+                })
+                .count();
+
+        return countThisWeek < 2;
     }
 
 }

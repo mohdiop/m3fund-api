@@ -41,6 +41,9 @@ public class ProjectOwner extends User {
     @Column(nullable = false)
     private double annualIncome;
 
+    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    private double fund;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_picture_id")
     private File profilePicture;

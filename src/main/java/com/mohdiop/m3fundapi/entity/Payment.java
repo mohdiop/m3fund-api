@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @Entity
 @Getter
@@ -49,7 +50,7 @@ public class Payment {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "payment")
     private CapitalPurchase capitalPurchase;
 
-    public PaymentResponse toResponse() {
+    public PaymentResponse toResponse(String... name) {
         return new PaymentResponse(
                 id,
                 transactionId,
@@ -57,7 +58,7 @@ public class Payment {
                 state,
                 carriedOutOn,
                 amount,
-                gift == null ? capitalPurchase == null ? "" : capitalPurchase.getCampaign().getProject().getName() : gift.getCampaign().getProject().getName(),
+                gift == null ? capitalPurchase == null ? Arrays.stream(name).findFirst().orElse("") : capitalPurchase.getCampaign().getProject().getName() : gift.getCampaign().getProject().getName(),
                 strategy
         );
     }

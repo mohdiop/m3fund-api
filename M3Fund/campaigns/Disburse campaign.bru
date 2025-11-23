@@ -1,0 +1,20 @@
+meta {
+  name: Disburse campaign
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/projects/campaigns/8/disburse
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidHlwZSI6IkFDQ0VTU19UT0tFTiIsInJvbGVzIjpbIlJPTEVfU1VQRVJfQURNSU4iLCJST0xFX1NZU1RFTSJdLCJpYXQiOjE3NjM5MDQzODksImV4cCI6MTc2Mzk5MDc4OX0.IZAF-IcaNVUjyfjsWpfroXqupF3x_fklGTLy21qepQI
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

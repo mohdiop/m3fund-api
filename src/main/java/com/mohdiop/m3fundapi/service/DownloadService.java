@@ -24,7 +24,8 @@ public class DownloadService {
         String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
         try {
             contentType = java.nio.file.Files.probeContentType(file.toPath());
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         if (contentType == null) {
             contentType = "application/octet-stream";

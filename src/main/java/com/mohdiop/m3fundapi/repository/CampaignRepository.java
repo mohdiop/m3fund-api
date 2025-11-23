@@ -1,13 +1,11 @@
 package com.mohdiop.m3fundapi.repository;
 
 import com.mohdiop.m3fundapi.entity.Campaign;
-import com.mohdiop.m3fundapi.entity.Project;
 import com.mohdiop.m3fundapi.entity.enums.CampaignState;
 import com.mohdiop.m3fundapi.entity.enums.CampaignType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;

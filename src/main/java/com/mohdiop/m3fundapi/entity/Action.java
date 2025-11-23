@@ -16,29 +16,26 @@ import java.time.LocalDateTime;
 @Builder
 public class Action {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private ActionType actionType;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EntityName entityName;
-
-    @Column(nullable = false)
-    private LocalDateTime actionDate;
-
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     Project project;
-
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;
-
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    Payment payment;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ActionType actionType;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EntityName entityName;
+    @Column(nullable = false)
+    private LocalDateTime actionDate;
     @ManyToOne
     @JoinColumn(nullable = false, name = "author_id")
     private Administrator author;

@@ -1,7 +1,10 @@
 package com.mohdiop.m3fundapi.entity;
 
 import com.mohdiop.m3fundapi.dto.response.AdministratorResponse;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

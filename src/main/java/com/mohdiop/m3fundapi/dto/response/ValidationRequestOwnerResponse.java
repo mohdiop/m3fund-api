@@ -9,5 +9,5 @@ public record ValidationRequestOwnerResponse(
         SimpleOwnerResponse owner,
         LocalDateTime date,
         ValidationState state
-)
-{}
+) {
+}

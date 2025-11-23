@@ -37,7 +37,7 @@ public class VolunteerController {
 
     @PreAuthorize("hasRole('CONTRIBUTOR')")
     @GetMapping("/{campaignId}/volunteers")
-    public ResponseEntity<?> getContributorVolunteering (
+    public ResponseEntity<?> getContributorVolunteering(
             @PathVariable Long campaignId
     ) {
         volunteerService.isVolunteerOfCampaign(

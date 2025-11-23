@@ -10,6 +10,7 @@ import com.mohdiop.m3fundapi.entity.enums.PaymentStrategy;
 import com.mohdiop.m3fundapi.entity.enums.UserState;
 import com.mohdiop.m3fundapi.repository.PaymentRepository;
 import com.mohdiop.m3fundapi.repository.ProjectRepository;
+import com.mohdiop.m3fundapi.repository.SystemRepository;
 import com.mohdiop.m3fundapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -26,11 +27,13 @@ public class StatsService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final PaymentRepository paymentRepository;
+    private final SystemRepository systemRepository;
 
-    public StatsService(UserRepository userRepository, ProjectRepository projectRepository, PaymentRepository paymentRepository) {
+    public StatsService(UserRepository userRepository, ProjectRepository projectRepository, PaymentRepository paymentRepository, SystemRepository systemRepository) {
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
         this.paymentRepository = paymentRepository;
+        this.systemRepository = systemRepository;
     }
 
     public AdminDashboardResponse getDashboardStats() {
@@ -89,20 +92,12 @@ public class StatsService {
         var allPayments = paymentRepository.findAll().stream().map(Payment::toResponse).toList();
         double totalFund = 0D;
         for (PaymentResponse payment : allPayments) {
-            totalFund+=payment.amount();
+            totalFund += payment.amount();
         }
         var cashedPayments = allPayments.stream().filter(paymentResponse -> paymentResponse.strategy() == PaymentStrategy.CASHED).toList();
         var disbursedPayments = allPayments.stream().filter(paymentResponse -> paymentResponse.strategy() == PaymentStrategy.DISBURSED).toList();
 
-        double totalCashed = 0D;
-        for (PaymentResponse payment : cashedPayments) {
-            totalCashed += payment.amount();
-        }
-
-        double totalDisbursed = 0D;
-        for (PaymentResponse payment : disbursedPayments) {
-            totalDisbursed += payment.amount();
-        }
+        var system = systemRepository.findAll().getFirst();
 
         return new AdminDashboardResponse(
                 totalActiveUsers,
@@ -113,7 +108,7 @@ public class StatsService {
                 countProjectsCreatedInCurrentMonth(allProjects),
                 projectsCurrentMonthScore,
                 projectsLastMonthScore,
-                totalCashed - totalDisbursed,
+                system.getFund(),
                 totalFund,
                 allPayments,
                 allProjects.stream().map(Project::toResponse).toList(),
@@ -198,7 +193,7 @@ public class StatsService {
         var totalPaymentAmount = 0D;
 
         for (Payment payment : allPayments) {
-            totalPaymentAmount+=payment.getAmount();
+            totalPaymentAmount += payment.getAmount();
         }
         return new StaticWebsiteStatsResponse(
                 totalUsers,

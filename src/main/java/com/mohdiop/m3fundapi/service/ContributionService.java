@@ -3,7 +3,6 @@ package com.mohdiop.m3fundapi.service;
 import com.mohdiop.m3fundapi.dto.response.ContributionResponse;
 import com.mohdiop.m3fundapi.dto.response.GiftResponse;
 import com.mohdiop.m3fundapi.dto.response.VolunteerResponse;
-import com.mohdiop.m3fundapi.entity.CapitalPurchase;
 import com.mohdiop.m3fundapi.entity.Volunteer;
 import com.mohdiop.m3fundapi.repository.GiftRepository;
 import com.mohdiop.m3fundapi.repository.VolunteerRepository;
