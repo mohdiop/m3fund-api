@@ -171,6 +171,7 @@ public class ProjectOwnerService {
                         .owner(projectOwnerToReturn)
                         .date(LocalDateTime.now())
                         .state(ValidationState.PENDING)
+                        .entity(EntityName.USER)
                         .build()
         );
         return projectOwnerToReturn.toAssociationResponse();
@@ -231,6 +232,7 @@ public class ProjectOwnerService {
                         .owner(projectOwnerToReturn)
                         .date(LocalDateTime.now())
                         .state(ValidationState.PENDING)
+                        .entity(EntityName.USER)
                         .build()
         );
         return projectOwnerToReturn.toOrganizationResponse();
