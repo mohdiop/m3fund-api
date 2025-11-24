@@ -15,6 +15,9 @@ public record AdminDashboardResponse(
         Double totalFund,
         List<PaymentResponse> payments,
         List<ProjectResponse> projects,
-        List<SimpleUserResponse> users
+        List<SimpleUserResponse> users,
+        Double monthlyNewPayments,
+        Double paymentsCurrentMonthScore,
+        Double paymentsLastMonthScore
 ) {
 }

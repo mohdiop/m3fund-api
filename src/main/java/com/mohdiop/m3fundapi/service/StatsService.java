@@ -6,7 +6,6 @@ import com.mohdiop.m3fundapi.dto.response.StaticWebsiteStatsResponse;
 import com.mohdiop.m3fundapi.entity.Payment;
 import com.mohdiop.m3fundapi.entity.Project;
 import com.mohdiop.m3fundapi.entity.User;
-import com.mohdiop.m3fundapi.entity.enums.PaymentStrategy;
 import com.mohdiop.m3fundapi.entity.enums.UserState;
 import com.mohdiop.m3fundapi.repository.PaymentRepository;
 import com.mohdiop.m3fundapi.repository.ProjectRepository;
@@ -94,8 +93,28 @@ public class StatsService {
         for (PaymentResponse payment : allPayments) {
             totalFund += payment.amount();
         }
-        var cashedPayments = allPayments.stream().filter(paymentResponse -> paymentResponse.strategy() == PaymentStrategy.CASHED).toList();
-        var disbursedPayments = allPayments.stream().filter(paymentResponse -> paymentResponse.strategy() == PaymentStrategy.DISBURSED).toList();
+        lastMonthAverage = getDailyAverageCreation(
+                allPayments,
+                YearMonth.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth().minus(1)),
+                p -> ((PaymentResponse) p).madeAt()
+        );
+        currentMonthAverage = getDailyAverageCreation(
+                allPayments,
+                YearMonth.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth()),
+                p -> ((PaymentResponse) p).madeAt()
+        );
+        lastMonthStdDev = getMonthlyStandardDeviation(
+                allPayments,
+                YearMonth.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth().minus(1)),
+                p -> ((PaymentResponse) p).madeAt()
+        );
+        currentMonthStdDev = getMonthlyStandardDeviation(
+                allPayments,
+                YearMonth.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth()),
+                p -> ((PaymentResponse) p).madeAt()
+        );
+        double paymentsLastMonthScore = lastMonthAverage / (lastMonthStdDev + 1);
+        double paymentsCurrentMonthScore = currentMonthAverage / (currentMonthStdDev + 1);
 
         var system = systemRepository.findAll().getFirst();
 
@@ -112,7 +131,10 @@ public class StatsService {
                 totalFund,
                 allPayments,
                 allProjects.stream().map(Project::toResponse).toList(),
-                allUsers.stream().map(User::toSimpleResponse).toList()
+                allUsers.stream().map(User::toSimpleResponse).toList(),
+                getCurrentMonthPaymentsAmount(allPayments),
+                paymentsCurrentMonthScore,
+                paymentsLastMonthScore
         );
     }
 
@@ -140,12 +162,27 @@ public class StatsService {
                 .count();
     }
 
+    public double getCurrentMonthPaymentsAmount(List<PaymentResponse> payments) {
+        YearMonth currentMonth = YearMonth.now();
+        LocalDate start = currentMonth.atDay(1);
+        LocalDate end = currentMonth.atEndOfMonth();
+
+        var monthlyPayments = payments.stream()
+                .filter(payment -> !payment.madeAt().toLocalDate().isBefore(start)
+                        && !payment.madeAt().toLocalDate().isAfter(end))
+                .toList();
+        double monthlyTotal = 0D;
+        for (PaymentResponse payment : monthlyPayments) {
+            monthlyTotal += payment.amount();
+        }
+        return monthlyTotal;
+    }
+
     public double getDailyAverageCreation(
             List<?> entities,
             YearMonth month,
             Function<Object, LocalDateTime> createdAtExtractor
     ) {
-
         LocalDate start = month.atDay(1);
         LocalDate end = month.atEndOfMonth();
         int daysInMonth = month.lengthOfMonth();
@@ -189,6 +226,7 @@ public class StatsService {
     public StaticWebsiteStatsResponse getWebsiteStats() {
         var totalUsers = userRepository.count();
         var allPayments = paymentRepository.findAll();
+        var totalProjects = projectRepository.count();
 
         var totalPaymentAmount = 0D;
 
@@ -197,6 +235,7 @@ public class StatsService {
         }
         return new StaticWebsiteStatsResponse(
                 totalUsers,
+                totalProjects,
                 totalPaymentAmount
         );
     }

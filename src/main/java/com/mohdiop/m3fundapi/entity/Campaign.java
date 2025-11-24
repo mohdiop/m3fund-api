@@ -1,6 +1,7 @@
 package com.mohdiop.m3fundapi.entity;
 
 import com.mohdiop.m3fundapi.dto.response.CampaignResponse;
+import com.mohdiop.m3fundapi.dto.response.PendingDisburseCampaignResponse;
 import com.mohdiop.m3fundapi.entity.enums.CampaignState;
 import com.mohdiop.m3fundapi.entity.enums.CampaignType;
 import jakarta.persistence.*;
@@ -83,6 +84,8 @@ public class Campaign {
             for (var gift : gifts) {
                 currentFund += gift.getPayment().getAmount();
             }
+        } else if (type == CampaignType.INVESTMENT && capitalPurchase != null) {
+            currentFund = capitalPurchase.getPayment().getAmount();
         }
         return new CampaignResponse(
                 id,
@@ -98,6 +101,28 @@ public class Campaign {
                 (rewards != null) ? rewards.stream().map(Reward::toResponse).toList() : Collections.emptyList(),
                 currentFund,
                 getCurrentVolunteerNumber()
+        );
+    }
+
+    public PendingDisburseCampaignResponse toPendingForDisbursingResponse() {
+        double amountToDisburse = 0D;
+        if (type == CampaignType.DONATION && gifts != null) {
+            for (var gift : gifts) {
+                amountToDisburse += gift.getPayment().getAmount();
+            }
+        } else if (type == CampaignType.INVESTMENT && capitalPurchase != null) {
+            amountToDisburse = capitalPurchase.getPayment().getAmount();
+        }
+        return new PendingDisburseCampaignResponse(
+                id,
+                project.getName(),
+                projectOwner.toSimpleOwnerResponse().name(),
+                projectOwner.getProfilePicture() == null ? null : projectOwner.getProfilePicture().getUrl(),
+                launchedAt,
+                endAt,
+                state,
+                isDisbursed,
+                amountToDisburse
         );
     }
 }

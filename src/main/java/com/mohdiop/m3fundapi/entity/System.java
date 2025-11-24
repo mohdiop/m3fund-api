@@ -1,5 +1,6 @@
 package com.mohdiop.m3fundapi.entity;
 
+import com.mohdiop.m3fundapi.dto.response.SystemResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,4 +31,13 @@ public class System {
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    public SystemResponse toResponse() {
+        return new SystemResponse(
+                name,
+                version,
+                fund,
+                createdAt
+        );
+    }
 }

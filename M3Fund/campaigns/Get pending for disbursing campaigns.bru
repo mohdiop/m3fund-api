@@ -1,11 +1,11 @@
 meta {
-  name: Disburse campaign
+  name: Get pending for disbursing campaigns
   type: http
-  seq: 10
+  seq: 11
 }
 
-post {
-  url: {{baseUrl}}/projects/campaigns/9/disburse
+get {
+  url: {{baseUrl}}/projects/campaigns/not-disbursed
   body: none
   auth: bearer
 }

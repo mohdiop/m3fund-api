@@ -4,6 +4,7 @@ import com.mohdiop.m3fundapi.dto.request.create.CreateCampaignRequest;
 import com.mohdiop.m3fundapi.dto.request.update.UpdateCampaignRequest;
 import com.mohdiop.m3fundapi.dto.response.CampaignResponse;
 import com.mohdiop.m3fundapi.dto.response.PaymentResponse;
+import com.mohdiop.m3fundapi.dto.response.PendingDisburseCampaignResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
 import com.mohdiop.m3fundapi.service.CampaignService;
 import com.mohdiop.m3fundapi.service.PaymentService;
@@ -86,6 +87,14 @@ public class CampaignController {
                         authenticationService.getCurrentUserId(),
                         campaignId
                 )
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'PAYMENTS_ADMIN')")
+    @GetMapping("/campaigns/not-disbursed")
+    public ResponseEntity<List<PendingDisburseCampaignResponse>> getPendingForDisbursingCampaigns() {
+        return ResponseEntity.ok(
+                campaignService.getPendingForDisburseCampaign()
         );
     }
 

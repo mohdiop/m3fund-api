@@ -1,5 +1,6 @@
 package com.mohdiop.m3fundapi.service;
 
+import com.mohdiop.m3fundapi.dto.response.SystemResponse;
 import com.mohdiop.m3fundapi.entity.System;
 import com.mohdiop.m3fundapi.repository.SystemRepository;
 import org.springframework.stereotype.Service;
@@ -37,5 +38,9 @@ public class SystemService {
                         .createdAt(LocalDateTime.now())
                         .build()
         );
+    }
+
+    public SystemResponse getSystemInfo() {
+        return systemRepository.findAll().getFirst().toResponse();
     }
 }

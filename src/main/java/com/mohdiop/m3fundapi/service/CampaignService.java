@@ -3,6 +3,7 @@ package com.mohdiop.m3fundapi.service;
 import com.mohdiop.m3fundapi.dto.request.create.CreateCampaignRequest;
 import com.mohdiop.m3fundapi.dto.request.update.UpdateCampaignRequest;
 import com.mohdiop.m3fundapi.dto.response.CampaignResponse;
+import com.mohdiop.m3fundapi.dto.response.PendingDisburseCampaignResponse;
 import com.mohdiop.m3fundapi.dto.response.ProjectResponse;
 import com.mohdiop.m3fundapi.entity.*;
 import com.mohdiop.m3fundapi.entity.enums.CampaignState;
@@ -268,6 +269,13 @@ public class CampaignService {
         stats.put("inProgress", campaigns.stream().filter(campaign -> campaign.getState() == CampaignState.IN_PROGRESS).count());
         stats.put("finished", campaigns.stream().filter(campaign -> campaign.getState() == CampaignState.FINISHED).count());
         return stats;
+    }
+
+    public List<PendingDisburseCampaignResponse> getPendingForDisburseCampaign() {
+        return campaignRepository.findByState(CampaignState.FINISHED)
+                .stream().filter(campaign -> !campaign.isDisbursed())
+                .map(Campaign::toPendingForDisbursingResponse)
+                .toList();
     }
 
     @Transactional
