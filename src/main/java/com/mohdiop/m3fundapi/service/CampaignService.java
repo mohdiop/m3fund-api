@@ -275,6 +275,7 @@ public class CampaignService {
         return campaignRepository.findByState(CampaignState.FINISHED)
                 .stream().filter(campaign -> !campaign.isDisbursed())
                 .map(Campaign::toPendingForDisbursingResponse)
+                .filter(p -> p.amountToDisburse() > 0D)
                 .toList();
     }
 
