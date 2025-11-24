@@ -22,6 +22,7 @@ public record IndividualProjectOwnerResponse(
         ProjectOwnerType type,
         UserState state,
         LocalDateTime createdAt,
-        Set<UserRole> roles
+        Set<UserRole> roles,
+        Double fund
 ) {
 }

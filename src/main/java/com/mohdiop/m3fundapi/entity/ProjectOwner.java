@@ -93,7 +93,8 @@ public class ProjectOwner extends User {
                 type,
                 getState(),
                 getUserCreatedAt(),
-                getUserRoles()
+                getUserRoles(),
+                fund
         );
     }
 
@@ -112,7 +113,8 @@ public class ProjectOwner extends User {
                 type,
                 getState(),
                 getUserCreatedAt(),
-                getUserRoles()
+                getUserRoles(),
+                fund
         );
     }
 
@@ -131,7 +133,8 @@ public class ProjectOwner extends User {
                 type,
                 getState(),
                 getUserCreatedAt(),
-                getUserRoles()
+                getUserRoles(),
+                fund
         );
     }
 

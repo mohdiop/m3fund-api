@@ -105,7 +105,11 @@ public class ContributorService {
                         () -> new RuntimeException("Un problème interne est survenu.")
                 );
         String title = "Compte créé";
-        String content = "Bienvenue sur M3Fund %s %s, découvrez des projets dans votre secteur et contribuez à leur développement.";
+        String content = String.format(
+                "Bienvenue sur M3Fund %s %s, découvrez des projets dans votre secteur et contribuez à leur développement.",
+                contributor.getFirstName(),
+                contributor.getLastName()
+        );
         notificationRepository.save(
                 new Notification(
                         null,

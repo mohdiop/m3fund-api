@@ -133,6 +133,9 @@ public class PaymentService {
         );
         sendDisbursingMail(totalToDisbursed, m3fundFees, campaign);
         campaign.setDisbursed(true);
+        campaign.getProjectOwner().setFund(
+                campaign.getProjectOwner().getFund() + totalToDisbursed
+        );
         campaignRepository.save(campaign);
         return payment.toResponse(campaign.getProject().getName());
     }
