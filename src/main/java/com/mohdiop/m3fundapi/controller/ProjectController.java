@@ -36,7 +36,7 @@ public class ProjectController {
     @PostMapping
     public ResponseEntity<ProjectResponse> createProject(
             @Valid @ModelAttribute CreateProjectRequest createProjectRequest
-    ) {
+    ) throws BadRequestException {
         return new ResponseEntity<>(
                 projectService.createProject(
                         authenticationService.getCurrentUserId(),

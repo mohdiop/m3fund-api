@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/projects/1/campaigns
+  url: {{baseUrl}}/projects/3/campaigns
   body: json
   auth: inherit
 }
@@ -15,6 +15,14 @@ body:json {
     "endAt": "2025-11-30T12:00:00",
     "type": "DONATION",
     "targetBudget": 12000000,
+    "localization": {
+      "country": "Mali",
+      "town": "Bamako",
+      "region": "Bamako",
+      "street": "Approx. 5 km North of Yirimandio",
+      "longitude": -7.922333999999999,
+      "latitude": 12.646197
+    },
     "rewards": [
       {
         "name": "Pack Logiciel Pro",

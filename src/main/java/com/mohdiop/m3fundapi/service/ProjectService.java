@@ -5,10 +5,7 @@ import com.mohdiop.m3fundapi.dto.request.update.UpdateProjectRequest;
 import com.mohdiop.m3fundapi.dto.response.OwnerProjectResponse;
 import com.mohdiop.m3fundapi.dto.response.ProjectResponse;
 import com.mohdiop.m3fundapi.dto.response.ProjectsStatsResponse;
-import com.mohdiop.m3fundapi.entity.File;
-import com.mohdiop.m3fundapi.entity.Project;
-import com.mohdiop.m3fundapi.entity.ProjectOwner;
-import com.mohdiop.m3fundapi.entity.ValidationRequest;
+import com.mohdiop.m3fundapi.entity.*;
 import com.mohdiop.m3fundapi.entity.enums.*;
 import com.mohdiop.m3fundapi.repository.ProjectOwnerRepository;
 import com.mohdiop.m3fundapi.repository.ProjectRepository;
@@ -43,11 +40,14 @@ public class ProjectService {
     public ProjectResponse createProject(
             Long ownerId,
             CreateProjectRequest createProjectRequest
-    ) {
+    ) throws BadRequestException {
         ProjectOwner owner = projectOwnerRepository.findById(ownerId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Porteur introuvable!")
                 );
+        if(owner.getState() == UserState.PENDING_VALIDATION) {
+            throw new BadRequestException("Impossible de créer un projet car vos informations sont en cours de validation suite à une récente modification de votre profil.");
+        }
         Project project = createProjectRequest.toProject();
         project.setOwner(owner);
         if (!createProjectRequest.images().isEmpty()) {
@@ -134,13 +134,36 @@ public class ProjectService {
             throw new AccessDeniedException("Accès refusé.");
         }
 
-        if (request.name() != null) project.setName(request.name());
-        if (request.resume() != null) project.setResume(request.resume());
-        if (request.description() != null) project.setDescription(request.description());
-        if (request.domain() != null) project.setDomain(request.domain());
-        if (request.objective() != null) project.setObjective(request.objective());
-        if (request.websiteLink() != null) project.setWebsiteLink(request.websiteLink());
-        if (request.launchedAt() != null) project.setLaunchedAt(request.launchedAt());
+        var changed = false;
+
+        if (request.name() != null && !request.name().equals(project.getName())) {
+            project.setName(request.name());
+            changed = true;
+        }
+        if (request.resume() != null && !request.resume().equals(project.getResume())) {
+            project.setResume(request.resume());
+            changed = true;
+        }
+        if (request.description() != null && !request.description().equals(project.getDescription())) {
+            project.setDescription(request.description());
+            changed = true;
+        }
+        if (request.domain() != null && request.domain() != project.getDomain()) {
+            project.setDomain(request.domain());
+            changed = true;
+        }
+        if (request.objective() != null && !request.objective().equals(project.getObjective())) {
+            project.setObjective(request.objective());
+            changed = true;
+        }
+        if (request.websiteLink() != null && !request.websiteLink().equals(project.getWebsiteLink())) {
+            project.setWebsiteLink(request.websiteLink());
+            changed = true;
+        }
+        if (request.launchedAt() != null) {
+            project.setLaunchedAt(request.launchedAt());
+            changed = true;
+        }
 
         if (request.images() != null && !request.images().isEmpty()) {
             project.getImages().clear();
@@ -155,6 +178,7 @@ public class ProjectService {
                             )
                     ).collect(Collectors.toSet())
             );
+            changed = true;
         }
 
         if (request.video() != null && !request.video().isEmpty()) {
@@ -166,6 +190,7 @@ public class ProjectService {
                             uploadService.getFileExtension(request.video())
                     )
             );
+            changed = true;
         }
 
         if (request.businessPlan() != null && !request.businessPlan().isEmpty()) {
@@ -176,6 +201,24 @@ public class ProjectService {
                             project.getBusinessPlan().getType(),
                             uploadService.getFileExtension(request.businessPlan())
                     )
+            );
+            changed = true;
+        }
+
+        if(changed) {
+            project.setValidated(false);
+            for (Campaign campaign : project.getCampaigns()) {
+                campaign.setState(CampaignState.SUSPENDED);
+            }
+            validationRequestRepository.save(
+                    ValidationRequest.builder()
+                            .id(null)
+                            .project(project)
+                            .state(ValidationState.PENDING)
+                            .type(ValidationType.MODIFICATION)
+                            .entity(EntityName.PROJECT)
+                            .date(LocalDateTime.now())
+                            .build()
             );
         }
 

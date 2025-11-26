@@ -1,0 +1,29 @@
+meta {
+  name: Register association project owner
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/auth/register/project-owners/association
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  entityName: Moov Malitel
+  email: telecelm3fund1@gmail.com
+  phone: +22320210026
+  annualIncome: 231400000.00
+  password: Test@1234
+  bankStatement: @file(C:\Users\moham\Desktop\m3fund\bank-statements\29616c45-f70a-4ac4-b7cb-0a86a7986c6f.pdf)
+  address: ACI 2000, Bamako, Mali
+  shareCapital: 3292904093.00
+  logo: @file(C:\Users\moham\Desktop\GitHub Projects\m3fund_flutter\assets\woman.png)
+  associationStatus: @file(C:\Users\moham\Desktop\m3fund\bank-statements\5cd4c85e-de10-4c49-afd2-7d66b5be6710.pdf)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -6,10 +6,7 @@ import com.mohdiop.m3fundapi.dto.response.CampaignResponse;
 import com.mohdiop.m3fundapi.dto.response.PendingDisburseCampaignResponse;
 import com.mohdiop.m3fundapi.dto.response.ProjectResponse;
 import com.mohdiop.m3fundapi.entity.*;
-import com.mohdiop.m3fundapi.entity.enums.CampaignState;
-import com.mohdiop.m3fundapi.entity.enums.CampaignType;
-import com.mohdiop.m3fundapi.entity.enums.NotificationType;
-import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
+import com.mohdiop.m3fundapi.entity.enums.*;
 import com.mohdiop.m3fundapi.repository.*;
 import com.mohdiop.m3fundapi.utility.GeoDistanceCalculator;
 import jakarta.persistence.EntityNotFoundException;
@@ -51,6 +48,9 @@ public class CampaignService {
                 .orElseThrow(
                         () -> new EntityNotFoundException("Porteur introuvable.")
                 );
+        if(owner.getState() == UserState.PENDING_VALIDATION) {
+            throw new BadRequestException("Impossible de créer une campagne, votre compte est en cours de validation suite à une modification récente.");
+        }
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Projet introuvable.")
@@ -58,9 +58,16 @@ public class CampaignService {
         if (!Objects.equals(project.getOwner().getId(), owner.getId())) {
             throw new AccessDeniedException("Accès réfusé.");
         }
+        for (Campaign campaign : project.getCampaigns()) {
+            if(campaign.getState() == CampaignState.IN_PROGRESS
+                    && campaign.getType() == createCampaignRequest.type()
+            ) {
+                throw new BadRequestException("Il y'a déjà une campagne en cours du même type pour ce projet.");
+            }
+        }
         var userCampaigns = campaignRepository.findByProjectOwnerId(ownerId);
         if (!canCreateCampaignThisWeek(userCampaigns, LocalDateTime.now())) {
-            throw new BadRequestException("Vous ne pouvez créer plus de 2 campagnes par semaine.");
+            throw new BadRequestException("Vous ne pouvez créer plus de 3 campagnes par semaine.");
         }
         Campaign campaign;
         switch (createCampaignRequest.type()) {
@@ -131,7 +138,7 @@ public class CampaignService {
                                 if (dist == -1D) {
                                     return false;
                                 }
-                                return dist <= 10D; // Vérifie si la distance est inférieur ou égale à 10km
+                                return dist <= 10D; // Vérifie si la distance est inférieure ou égale à 10km
                             }
                     )
                     .map(Campaign::toResponse)

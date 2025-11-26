@@ -1,7 +1,11 @@
 package com.mohdiop.m3fundapi.controller;
 
+import com.mohdiop.m3fundapi.dto.request.update.UpdateAssociationProjectOwnerRequest;
 import com.mohdiop.m3fundapi.dto.request.update.UpdateIndividualProjectOwnerRequest;
+import com.mohdiop.m3fundapi.dto.request.update.UpdateOrganizationProjectOwnerRequest;
+import com.mohdiop.m3fundapi.dto.response.AssociationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.IndividualProjectOwnerResponse;
+import com.mohdiop.m3fundapi.dto.response.OrganizationProjectOwnerResponse;
 import com.mohdiop.m3fundapi.service.AuthenticationService;
 import com.mohdiop.m3fundapi.service.ProjectOwnerService;
 import jakarta.validation.Valid;
@@ -23,7 +27,7 @@ public class ProjectOwnerController {
     }
 
     @PreAuthorize("hasRole('PROJECT_OWNER')")
-    @PatchMapping
+    @PatchMapping("/individuals")
     public ResponseEntity<IndividualProjectOwnerResponse> updateIndividualProjectOwner(
             @Valid UpdateIndividualProjectOwnerRequest updateIndividualProjectOwnerRequest
     ) throws BadRequestException {
@@ -31,6 +35,32 @@ public class ProjectOwnerController {
                 projectOwnerService.updateIndividualProjectOwner(
                         authenticationService.getCurrentUserId(),
                         updateIndividualProjectOwnerRequest
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @PatchMapping("/organizations")
+    public ResponseEntity<OrganizationProjectOwnerResponse> updateOrganizationProjectOwner(
+            @Valid UpdateOrganizationProjectOwnerRequest updateOrganizationProjectOwnerRequest
+            ) throws BadRequestException {
+        return ResponseEntity.ok(
+                projectOwnerService.updateOrganizationProjectOwner(
+                        authenticationService.getCurrentUserId(),
+                        updateOrganizationProjectOwnerRequest
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('PROJECT_OWNER')")
+    @PatchMapping("/associations")
+    public ResponseEntity<AssociationProjectOwnerResponse> updateAssociationProjectOwner(
+            @Valid UpdateAssociationProjectOwnerRequest updateAssociationProjectOwnerRequest
+    ) throws BadRequestException {
+        return ResponseEntity.ok(
+                projectOwnerService.updateAssociationProjectOwner(
+                        authenticationService.getCurrentUserId(),
+                        updateAssociationProjectOwnerRequest
                 )
         );
     }

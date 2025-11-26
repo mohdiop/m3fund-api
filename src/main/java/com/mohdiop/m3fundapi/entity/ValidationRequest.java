@@ -4,6 +4,7 @@ import com.mohdiop.m3fundapi.dto.response.ValidationRequestOwnerResponse;
 import com.mohdiop.m3fundapi.dto.response.ValidationRequestProjectResponse;
 import com.mohdiop.m3fundapi.entity.enums.EntityName;
 import com.mohdiop.m3fundapi.entity.enums.ValidationState;
+import com.mohdiop.m3fundapi.entity.enums.ValidationType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,11 +25,11 @@ public class ValidationRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private ProjectOwner owner;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id")
     private Project project;
 
@@ -43,12 +44,17 @@ public class ValidationRequest {
     @Column(nullable = false)
     private LocalDateTime date;
 
+    @Column(nullable = false, columnDefinition = "ENUM('CREATION', 'MODIFICATION') DEFAULT 'CREATION'")
+    @Enumerated(EnumType.STRING)
+    private ValidationType type;
+
     public ValidationRequestOwnerResponse toOwnerResponse() {
         return new ValidationRequestOwnerResponse(
                 id,
                 owner.toSimpleOwnerResponse(),
                 date,
-                state
+                state,
+                type
         );
     }
 
@@ -58,7 +64,8 @@ public class ValidationRequest {
                 project.toResponse(),
                 date,
                 state,
-                project.getOwner().toSimpleOwnerResponse().name()
+                project.getOwner().toSimpleOwnerResponse().name(),
+                type
         );
     }
 }

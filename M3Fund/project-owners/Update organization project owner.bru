@@ -1,23 +1,17 @@
 meta {
-  name: Update project
+  name: Update organization project owner
   type: http
-  seq: 4
+  seq: 1
 }
 
 patch {
-  url: {{baseUrl}}/projects/3
+  url: {{baseUrl}}/project-owners/organizations
   body: multipartForm
   auth: inherit
 }
 
-body:json {
-  {
-    "name": "Collab Dev"
-  }
-}
-
 body:multipart-form {
-  domain: SOLIDARITY
+  entityName: Tidio
 }
 
 settings {

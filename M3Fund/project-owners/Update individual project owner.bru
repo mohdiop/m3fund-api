@@ -1,23 +1,17 @@
 meta {
-  name: Update project
+  name: Update individual project owner
   type: http
   seq: 4
 }
 
 patch {
-  url: {{baseUrl}}/projects/3
+  url: {{baseUrl}}/project-owners/individuals
   body: multipartForm
   auth: inherit
 }
 
-body:json {
-  {
-    "name": "Collab Dev"
-  }
-}
-
 body:multipart-form {
-  domain: SOLIDARITY
+  firstName: Mohamedy
 }
 
 settings {
