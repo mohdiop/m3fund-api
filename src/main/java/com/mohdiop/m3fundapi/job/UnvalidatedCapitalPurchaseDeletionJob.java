@@ -16,7 +16,7 @@ public class UnvalidatedCapitalPurchaseDeletionJob {
     }
 
     @Transactional
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void finishCampaigns() {
         capitalPurchaseRepository.deleteOldUnvalidatedPurchases(
                 LocalDateTime.now().minusWeeks(1)

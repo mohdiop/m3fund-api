@@ -15,7 +15,7 @@ public class CampaignsFinishingJob {
     }
 
     @Transactional
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void finishCampaigns() {
         campaignService.finishCampaigns();
     }
