@@ -94,23 +94,10 @@ public class ProjectService {
                         .state(ValidationState.PENDING)
                         .date(LocalDateTime.now())
                         .entity(EntityName.PROJECT)
+                        .type(ValidationType.CREATION)
                         .build()
         );
         return projectResponse.toResponse();
-    }
-
-    public OwnerProjectResponse validateProject(
-            Long projectId
-    ) throws BadRequestException {
-        Project projectToValidate = projectRepository.findById(projectId)
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Projet introuvable!")
-                );
-        if (projectToValidate.isValidated()) {
-            throw new BadRequestException("Projet déjà validé.");
-        }
-        projectToValidate.setValidated(true);
-        return projectRepository.save(projectToValidate).toOwnerProjectResponse();
     }
 
     public List<OwnerProjectResponse> getAllProjects() {

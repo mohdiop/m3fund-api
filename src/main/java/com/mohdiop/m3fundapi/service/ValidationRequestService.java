@@ -41,16 +41,13 @@ public class ValidationRequestService {
     @Transactional
     public ValidationRequestOwnerResponse validateOwner(
             Long authorId,
-            Long ownerId
+            Long validationId
     ) throws BadRequestException {
-        var owner = projectOwnerRepository.findById(ownerId)
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Utilisateur introuvable.")
-                );
-        var validationRequest = validationRequestRepository.findByOwnerId(ownerId)
+        var validationRequest = validationRequestRepository.findById(validationId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Pas de demande de validation pour cet utilisateur.")
                 );
+        var owner = validationRequest.getOwner();
         var author = administratorRepository.findById(authorId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Utilisateur introuvable.")
@@ -79,16 +76,13 @@ public class ValidationRequestService {
     @Transactional
     public ValidationRequestOwnerResponse refuseOwner(
             Long authorId,
-            Long ownerId
+            Long validationId
     ) throws BadRequestException {
-        var owner = projectOwnerRepository.findById(ownerId)
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Utilisateur introuvable.")
-                );
-        var validationRequest = validationRequestRepository.findByOwnerId(ownerId)
+        var validationRequest = validationRequestRepository.findById(validationId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Pas de demande de validation pour cet utilisateur.")
                 );
+        var owner = validationRequest.getOwner();
         var author = administratorRepository.findById(authorId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Utilisateur introuvable.")
@@ -118,16 +112,13 @@ public class ValidationRequestService {
 
     public ValidationRequestProjectResponse validateProject(
             Long authorId,
-            Long projectId
+            Long validationId
     ) throws BadRequestException {
-        var project = projectRepository.findById(projectId)
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Projet introuvable.")
-                );
-        var validation = validationRequestRepository.findByProjectId(projectId)
+        var validation = validationRequestRepository.findById(validationId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Demande de validation introuvable.")
                 );
+        var project = validation.getProject();
         var author = administratorRepository.findById(authorId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Utilisateur introuvable.")
@@ -154,16 +145,13 @@ public class ValidationRequestService {
 
     public ValidationRequestProjectResponse refuseProject(
             Long authorId,
-            Long projectId
+            Long validationId
     ) throws BadRequestException {
-        var project = projectRepository.findById(projectId)
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Projet introuvable.")
-                );
-        var validation = validationRequestRepository.findByProjectId(projectId)
+        var validation = validationRequestRepository.findById(validationId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Demande de validation introuvable.")
                 );
+        var project = validation.getProject();
         var author = administratorRepository.findById(authorId)
                 .orElseThrow(
                         () -> new EntityNotFoundException("Utilisateur introuvable.")

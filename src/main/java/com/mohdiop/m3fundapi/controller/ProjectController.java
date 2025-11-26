@@ -46,16 +46,6 @@ public class ProjectController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
-    @PostMapping("/{projectId}/validate")
-    public ResponseEntity<OwnerProjectResponse> validateProject(
-            @PathVariable Long projectId
-    ) throws BadRequestException {
-        return ResponseEntity.ok(
-                projectService.validateProject(projectId)
-        );
-    }
-
     @PreAuthorize("hasRole('CONTRIBUTOR')")
     @PostMapping("/campaigns/batch")
     public ResponseEntity<List<ProjectResponse>> getProjectsByAllCampaigns(

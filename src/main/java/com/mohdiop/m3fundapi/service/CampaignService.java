@@ -92,8 +92,11 @@ public class CampaignService {
     }
 
     public List<CampaignResponse> getAllCampaigns() {
-        var allCampaigns = campaignRepository.findAll();
-        return allCampaigns.stream().map(Campaign::toResponse).toList();
+        var allCampaigns = campaignRepository.findByState(CampaignState.IN_PROGRESS);
+        return allCampaigns.stream()
+                .filter(campaign -> campaign.getProject().isValidated())
+                .map(Campaign::toResponse)
+                .toList();
     }
 
     public List<CampaignResponse> getContributorRecommendation(
@@ -160,7 +163,10 @@ public class CampaignService {
                 LocalDateTime.now().minusWeeks(2), CampaignState.IN_PROGRESS
         );
         if (campaigns.isEmpty()) return new ArrayList<>();
-        return campaigns.stream().map(Campaign::toResponse).toList();
+        return campaigns.stream()
+                .filter(campaign -> campaign.getProject().isValidated())
+                .map(Campaign::toResponse)
+                .toList();
     }
 
     public CampaignResponse updateCampaign(
@@ -252,6 +258,14 @@ public class CampaignService {
         return campaigns.stream().map(Campaign::toResponse).toList();
     }
 
+    public List<CampaignResponse> getSuspendedCampaigns(
+            Long ownerId
+    ) {
+        var campaigns = campaignRepository.findByProjectOwnerIdAndState(ownerId, CampaignState.SUSPENDED);
+        if (campaigns.isEmpty()) return new ArrayList<>();
+        return campaigns.stream().map(Campaign::toResponse).toList();
+    }
+
     public List<CampaignResponse> getCampaignsByOwnerIdAndProjectId(
             Long ownerId,
             Long projectId
@@ -297,11 +311,13 @@ public class CampaignService {
         if (campaigns.isEmpty()) {
             stats.put("total", 0L);
             stats.put("inProgress", 0L);
+            stats.put("suspended", 0L);
             stats.put("finished", 0L);
             return stats;
         }
         stats.put("total", (long) campaigns.size());
         stats.put("inProgress", campaigns.stream().filter(campaign -> campaign.getState() == CampaignState.IN_PROGRESS).count());
+        stats.put("suspended", campaigns.stream().filter(campaign -> campaign.getState() == CampaignState.SUSPENDED).count());
         stats.put("finished", campaigns.stream().filter(campaign -> campaign.getState() == CampaignState.FINISHED).count());
         return stats;
     }
@@ -325,6 +341,9 @@ public class CampaignService {
                 );
         if (!Objects.equals(campaign.getProjectOwner().getId(), authorId)) {
             throw new AccessDeniedException("Accès interdit à cette ressource");
+        }
+        if(campaign.getProjectOwner().getState() == UserState.PENDING_VALIDATION) {
+            throw new BadRequestException("Impossible de finir une campagne tant que vous n'êtes pas validé.");
         }
         if (campaign.getState() == CampaignState.FINISHED) {
             throw new BadRequestException("Cette campagne est déjà terminée.");

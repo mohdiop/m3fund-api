@@ -24,53 +24,53 @@ public class ValidationController {
     }
 
     @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
-    @PostMapping("/owners/{ownerId}/validate")
+    @PostMapping("/{validationId}/owners/validate")
     public ResponseEntity<ValidationRequestOwnerResponse> validateOwner(
-            @PathVariable Long ownerId
+            @PathVariable Long validationId
     ) throws BadRequestException {
         return ResponseEntity.ok(
                 validationRequestService.validateOwner(
                         authenticationService.getCurrentUserId(),
-                        ownerId
+                        validationId
                 )
         );
     }
 
     @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
-    @PostMapping("/owners/{ownerId}/refuse")
+    @PostMapping("/{validationId}/owners/refuse")
     public ResponseEntity<ValidationRequestOwnerResponse> refuseValidation(
-            @PathVariable Long ownerId
+            @PathVariable Long validationId
     ) throws BadRequestException {
         return ResponseEntity.ok(
                 validationRequestService.refuseOwner(
                         authenticationService.getCurrentUserId(),
-                        ownerId
+                        validationId
                 )
         );
     }
 
     @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
-    @PostMapping("/projects/{projectId}/validate")
+    @PostMapping("/{validationId}/projects/validate")
     public ResponseEntity<ValidationRequestProjectResponse> validateProject(
-            @PathVariable Long projectId
+            @PathVariable Long validationId
     ) throws BadRequestException {
         return ResponseEntity.ok(
                 validationRequestService.validateProject(
                         authenticationService.getCurrentUserId(),
-                        projectId
+                        validationId
                 )
         );
     }
 
     @PreAuthorize("hasAnyRole('SYSTEM', 'SUPER_ADMIN', 'VALIDATIONS_ADMIN')")
-    @PostMapping("/projects/{projectId}/refuse")
+    @PostMapping("/{validationId}/projects/refuse")
     public ResponseEntity<ValidationRequestProjectResponse> refuseProject(
-            @PathVariable Long projectId
+            @PathVariable Long validationId
     ) throws BadRequestException {
         return ResponseEntity.ok(
                 validationRequestService.refuseProject(
                         authenticationService.getCurrentUserId(),
-                        projectId
+                        validationId
                 )
         );
     }
