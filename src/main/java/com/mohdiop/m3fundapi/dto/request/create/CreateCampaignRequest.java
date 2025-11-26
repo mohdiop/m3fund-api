@@ -28,7 +28,10 @@ public record CreateCampaignRequest(
         Double shareOffered,
 
         @Valid
-        Set<CreateRewardRequest> rewards
+        Set<CreateRewardRequest> rewards,
+
+        @Valid
+        CreateLocalizationRequest localization
 
 ) {
 
@@ -40,6 +43,7 @@ public record CreateCampaignRequest(
                 .targetBudget(targetBudget)
                 .type(CampaignType.DONATION)
                 .state(CampaignState.IN_PROGRESS)
+                .localization(localization.toLocalization())
                 .build();
     }
 
@@ -51,6 +55,7 @@ public record CreateCampaignRequest(
                 .targetVolunteer(targetVolunteer)
                 .type(CampaignType.VOLUNTEERING)
                 .state(CampaignState.IN_PROGRESS)
+                .localization(localization.toLocalization())
                 .build();
     }
 
@@ -62,6 +67,7 @@ public record CreateCampaignRequest(
                 .shareOffered(shareOffered)
                 .type(CampaignType.INVESTMENT)
                 .state(CampaignState.IN_PROGRESS)
+                .localization(localization.toLocalization())
                 .build();
     }
 }

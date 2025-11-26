@@ -11,6 +11,7 @@ import com.mohdiop.m3fundapi.entity.enums.CampaignType;
 import com.mohdiop.m3fundapi.entity.enums.NotificationType;
 import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
 import com.mohdiop.m3fundapi.repository.*;
+import com.mohdiop.m3fundapi.utility.GeoDistanceCalculator;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.security.access.AccessDeniedException;
@@ -97,18 +98,45 @@ public class CampaignService {
                 );
         Set<CampaignResponse> campaigns = new HashSet<>();
         for (CampaignType campaignType : contributor.getCampaignTypes()) {
-            var camps = campaignRepository.findByTypeAndState(campaignType, CampaignState.IN_PROGRESS);
-            campaigns.addAll(camps.stream().map(Campaign::toResponse).toList());
-        }
-        List<Project> projects = new ArrayList<>();
-        for (ProjectDomain projectDomain : contributor.getProjectDomains()) {
-            var pro = projectRepository.findByDomainAndIsValidated(projectDomain, true);
-            projects.addAll(pro);
-        }
-        for (Project project : projects) {
-            if (!project.getCampaigns().isEmpty()) {
-                campaigns.addAll(project.getCampaigns().stream().map(Campaign::toResponse).toList());
-            }
+            var camps = campaignRepository.findByTypeAndState(campaignType, CampaignState.IN_PROGRESS).stream()
+                    .filter(campaign -> campaign.getProject().isValidated())
+                    .filter(campaign -> {
+                                for (ProjectDomain projectDomain : contributor.getProjectDomains()) {
+                                    if (ProjectDomain.areDomainsClose(
+                                            projectDomain,
+                                            campaign.getProject().getDomain()
+                                    )
+                                    ) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+                    )
+                    .filter(campaign -> {
+                                var dist = GeoDistanceCalculator.calculateDistanceVincenty(
+                                        contributor.getLocalization() == null ? 0D
+                                                : contributor.getLocalization().getLatitude(),
+                                        contributor.getLocalization() == null ? 0D
+                                                : contributor.getLocalization().getLongitude(),
+                                        0D,
+                                        campaign.getLocalization() == null ? 0D
+                                                : campaign.getLocalization().getLatitude(),
+                                        campaign.getLocalization() == null ? 0D
+                                                : campaign.getLocalization().getLongitude(),
+                                        0D
+                                );
+                                // Enlève la campagne de la liste si le contributeur n'a pas de coordonnées
+                                // ou que la campagne n'en a pas
+                                if (dist == -1D) {
+                                    return false;
+                                }
+                                return dist <= 10D; // Vérifie si la distance est inférieur ou égale à 10km
+                            }
+                    )
+                    .map(Campaign::toResponse)
+                    .toList();
+            campaigns.addAll(camps);
         }
         return campaigns.stream().toList();
     }
@@ -410,7 +438,7 @@ public class CampaignService {
      *
      * @param campaigns   la liste des campagnes existantes
      * @param dateToCheck la date à laquelle on veut créer la campagne (ex: maintenant)
-     * @return true si moins de 2 campagnes sont déjà créées cette semaine, false sinon
+     * @return true si moins de 3 campagnes sont déjà créées cette semaine, false sinon
      */
     private boolean canCreateCampaignThisWeek(List<Campaign> campaigns, LocalDateTime dateToCheck) {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
@@ -426,7 +454,7 @@ public class CampaignService {
                 })
                 .count();
 
-        return countThisWeek < 2;
+        return countThisWeek < 3;
     }
 
 }

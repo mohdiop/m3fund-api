@@ -26,7 +26,7 @@ public class Contributor extends User {
     private String lastName;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "localization_id", nullable = false)
+    @JoinColumn(name = "localization_id")
     private Localization localization;
 
     @ElementCollection(fetch = FetchType.EAGER)

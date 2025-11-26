@@ -5,6 +5,7 @@ import com.mohdiop.m3fundapi.entity.enums.CampaignType;
 import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
 import com.mohdiop.m3fundapi.entity.enums.UserRole;
 import com.mohdiop.m3fundapi.entity.enums.UserState;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
@@ -23,7 +24,7 @@ public record CreateContributorRequest(
         @Size(min = 2, max = 50, message = "Le nom doit comporter entre 2 et 50 caractères.")
         String lastName,
 
-        @NotNull(message = "La localisation est obligatoire.")
+        @Valid
         CreateLocalizationRequest localization,
 
         @NotNull(message = "Les préférences de domaines de projet de l'utilisateur sont obligatoires.")

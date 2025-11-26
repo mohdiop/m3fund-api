@@ -56,6 +56,10 @@ public class Campaign {
     @Enumerated(EnumType.STRING)
     private CampaignState state;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "localization_id")
+    private Localization localization;
+
     @Column(nullable = false, columnDefinition = "BOOL DEFAULT FALSE")
     private boolean isDisbursed;
 
@@ -100,7 +104,8 @@ public class Campaign {
                 state,
                 (rewards != null) ? rewards.stream().map(Reward::toResponse).toList() : Collections.emptyList(),
                 currentFund,
-                getCurrentVolunteerNumber()
+                getCurrentVolunteerNumber(),
+                localization != null ? localization.toResponse() : null
         );
     }
 

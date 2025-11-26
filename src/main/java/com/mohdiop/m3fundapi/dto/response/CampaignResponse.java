@@ -19,6 +19,7 @@ public record CampaignResponse(
         CampaignState state,
         List<RewardResponse> rewards,
         double currentFund,
-        int numberOfVolunteer
+        int numberOfVolunteer,
+        LocalizationResponse localization
 ) {
 }
