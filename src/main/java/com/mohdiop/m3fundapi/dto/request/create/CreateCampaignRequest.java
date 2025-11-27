@@ -67,7 +67,7 @@ public record CreateCampaignRequest(
                 .shareOffered(shareOffered)
                 .type(CampaignType.INVESTMENT)
                 .state(CampaignState.IN_PROGRESS)
-                .localization(localization.toLocalization())
+                .localization(localization != null ? localization.toLocalization() : null)
                 .build();
     }
 }
