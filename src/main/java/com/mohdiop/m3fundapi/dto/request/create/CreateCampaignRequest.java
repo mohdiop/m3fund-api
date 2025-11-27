@@ -43,7 +43,7 @@ public record CreateCampaignRequest(
                 .targetBudget(targetBudget)
                 .type(CampaignType.DONATION)
                 .state(CampaignState.IN_PROGRESS)
-                .localization(localization.toLocalization())
+                .localization(localization != null ? localization.toLocalization() : null)
                 .build();
     }
 
@@ -55,7 +55,7 @@ public record CreateCampaignRequest(
                 .targetVolunteer(targetVolunteer)
                 .type(CampaignType.VOLUNTEERING)
                 .state(CampaignState.IN_PROGRESS)
-                .localization(localization.toLocalization())
+                .localization(localization != null ? localization.toLocalization() : null)
                 .build();
     }
 
