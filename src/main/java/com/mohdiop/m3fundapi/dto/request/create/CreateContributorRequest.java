@@ -75,7 +75,7 @@ public record CreateContributorRequest(
                 .userRoles(new HashSet<>(List.of(UserRole.ROLE_CONTRIBUTOR)))
                 .userCreatedAt(LocalDateTime.now())
                 .localization(
-                        localization.toLocalization()
+                        localization == null ? null : localization.toLocalization()
                 )
                 .build();
     }
