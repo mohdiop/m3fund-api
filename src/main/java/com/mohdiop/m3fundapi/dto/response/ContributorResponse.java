@@ -19,6 +19,7 @@ public record ContributorResponse(
         Set<CampaignType> campaignTypePrefs,
         UserState state,
         LocalDateTime createdAt,
-        Set<UserRole> roles
+        Set<UserRole> roles,
+        String profilePictureUrl
 ) {
 }

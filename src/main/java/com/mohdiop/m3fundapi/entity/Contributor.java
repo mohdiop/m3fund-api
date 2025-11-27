@@ -41,6 +41,10 @@ public class Contributor extends User {
     @Enumerated(EnumType.STRING)
     private Set<CampaignType> campaignTypes;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_picture_id")
+    private File profilePicture;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "contributor")
     private Set<Discussion> discussions;
 
@@ -57,6 +61,19 @@ public class Contributor extends User {
     private Set<RewardWinning> rewardWinnings;
 
     public ContributorResponse toResponse() {
-        return new ContributorResponse(getId(), firstName, lastName, getEmail(), getPhone(), localization.toResponse(), projectDomains, campaignTypes, getState(), getUserCreatedAt(), getUserRoles());
+        return new ContributorResponse(
+                getId(),
+                firstName,
+                lastName,
+                getEmail(),
+                getPhone(),
+                localization.toResponse(),
+                projectDomains,
+                campaignTypes,
+                getState(),
+                getUserCreatedAt(),
+                getUserRoles(),
+                profilePicture != null ? profilePicture.getUrl() : null
+        );
     }
 }

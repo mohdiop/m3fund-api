@@ -1,5 +1,7 @@
 package com.mohdiop.m3fundapi.dto.request.create;
 
+import com.mohdiop.m3fundapi.annotation.FileContentTypeIfPresent;
+import com.mohdiop.m3fundapi.annotation.FileNotEmptyIfPresent;
 import com.mohdiop.m3fundapi.entity.Contributor;
 import com.mohdiop.m3fundapi.entity.enums.CampaignType;
 import com.mohdiop.m3fundapi.entity.enums.ProjectDomain;
@@ -8,6 +10,7 @@ import com.mohdiop.m3fundapi.entity.enums.UserState;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -50,7 +53,11 @@ public record CreateContributorRequest(
                 regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&]).+$",
                 message = "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial."
         )
-        String password
+        String password,
+
+        @FileNotEmptyIfPresent(message = "Le fichier de la photo de profil ne peut pas être vide.")
+        @FileContentTypeIfPresent(allowed = {"image/jpeg", "image/png"}, message = "La photo de profil doit être au format JPG ou PNG.")
+        MultipartFile profilePicture
 ) {
 
     public Contributor toContributor() {

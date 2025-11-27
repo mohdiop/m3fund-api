@@ -43,7 +43,7 @@ public class AuthenticationController {
 
     @PostMapping("/register/contributors")
     public ResponseEntity<ContributorResponse> registerContributor(
-            @Valid @RequestBody CreateContributorRequest createContributorRequest
+            @Valid @ModelAttribute CreateContributorRequest createContributorRequest
     ) throws BadRequestException {
         return new ResponseEntity<>(
                 contributorService.createContributor(createContributorRequest),
