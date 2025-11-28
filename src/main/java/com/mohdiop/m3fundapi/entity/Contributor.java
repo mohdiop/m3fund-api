@@ -67,7 +67,7 @@ public class Contributor extends User {
                 lastName,
                 getEmail(),
                 getPhone(),
-                localization.toResponse(),
+                localization == null ? null : localization.toResponse(),
                 projectDomains,
                 campaignTypes,
                 getState(),
