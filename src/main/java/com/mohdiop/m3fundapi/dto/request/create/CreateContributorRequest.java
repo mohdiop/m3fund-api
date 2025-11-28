@@ -57,6 +57,7 @@ public record CreateContributorRequest(
 
         @FileNotEmptyIfPresent(message = "Le fichier de la photo de profil ne peut pas être vide.")
         @FileContentTypeIfPresent(allowed = {
+                "image/jpg",
                 "image/jpeg",
                 "image/png",
                 "image/gif",
