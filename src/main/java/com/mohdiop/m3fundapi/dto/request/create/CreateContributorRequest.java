@@ -56,7 +56,19 @@ public record CreateContributorRequest(
         String password,
 
         @FileNotEmptyIfPresent(message = "Le fichier de la photo de profil ne peut pas être vide.")
-        @FileContentTypeIfPresent(allowed = {"image/jpeg", "image/png"}, message = "La photo de profil doit être au format JPG ou PNG.")
+        @FileContentTypeIfPresent(allowed = {
+                "image/jpeg",
+                "image/png",
+                "image/gif",
+                "image/webp",
+                "image/bmp",
+                "image/tiff",
+                "image/svg+xml",
+                "image/heic",
+                "image/heif",
+                "image/avif"
+        }
+                , message = "La photo de profil doit être au format JPG ou PNG.")
         MultipartFile profilePicture
 ) {
 
