@@ -5,6 +5,7 @@ import com.mohdiop.m3fundapi.dto.request.update.UpdateContributorRequest;
 import com.mohdiop.m3fundapi.dto.response.ContributorResponse;
 import com.mohdiop.m3fundapi.entity.Contributor;
 import com.mohdiop.m3fundapi.entity.Notification;
+import com.mohdiop.m3fundapi.entity.enums.FileType;
 import com.mohdiop.m3fundapi.entity.enums.NotificationType;
 import com.mohdiop.m3fundapi.repository.ContributorRepository;
 import com.mohdiop.m3fundapi.repository.NotificationRepository;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class ContributorService {
@@ -23,11 +25,13 @@ public class ContributorService {
     private final ContributorRepository contributorRepository;
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
+    private final UploadService uploadService;
 
-    public ContributorService(ContributorRepository contributorRepository, UserRepository userRepository, NotificationRepository notificationRepository) {
+    public ContributorService(ContributorRepository contributorRepository, UserRepository userRepository, NotificationRepository notificationRepository, UploadService uploadService) {
         this.contributorRepository = contributorRepository;
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
+        this.uploadService = uploadService;
     }
 
     @Transactional
@@ -40,8 +44,22 @@ public class ContributorService {
         if (userRepository.findByPhone(createContributorRequest.phone()).isPresent()) {
             throw new BadRequestException("Numéro de téléphone invalide!");
         }
+        var contributorToSave = createContributorRequest.toContributor();
+
+        if (createContributorRequest.profilePicture() != null) {
+            contributorToSave.setProfilePicture(
+                    uploadService.uploadFile(
+                            createContributorRequest.profilePicture(),
+                            UUID.randomUUID().toString(),
+                            FileType.PICTURE,
+                            uploadService.getFileExtension(
+                                    createContributorRequest.profilePicture()
+                            )
+                    )
+            );
+        }
         var contributor = contributorRepository.save(
-                createContributorRequest.toContributor()
+                contributorToSave
         ).toResponse();
         sendAccountCreationNotification(contributor.id());
         return contributor;
