@@ -4,6 +4,7 @@ import com.mohdiop.m3fundapi.dto.request.create.CreateCapitalPurchaseRequest;
 import com.mohdiop.m3fundapi.dto.response.CapitalPurchaseResponse;
 import com.mohdiop.m3fundapi.entity.Contributor;
 import com.mohdiop.m3fundapi.entity.Notification;
+import com.mohdiop.m3fundapi.entity.enums.CampaignState;
 import com.mohdiop.m3fundapi.entity.enums.CampaignType;
 import com.mohdiop.m3fundapi.entity.enums.NotificationType;
 import com.mohdiop.m3fundapi.repository.*;
@@ -22,13 +23,15 @@ public class CapitalPurchaseService {
     private final CampaignRepository campaignRepository;
     private final ProjectOwnerRepository projectOwnerRepository;
     private final NotificationRepository notificationRepository;
+    private final CampaignService campaignService;
 
-    public CapitalPurchaseService(CapitalPurchaseRepository capitalPurchaseRepository, ContributorRepository contributorRepository, CampaignRepository campaignRepository, ProjectOwnerRepository projectOwnerRepository, NotificationRepository notificationRepository) {
+    public CapitalPurchaseService(CapitalPurchaseRepository capitalPurchaseRepository, ContributorRepository contributorRepository, CampaignRepository campaignRepository, ProjectOwnerRepository projectOwnerRepository, NotificationRepository notificationRepository, CampaignService campaignService) {
         this.capitalPurchaseRepository = capitalPurchaseRepository;
         this.contributorRepository = contributorRepository;
         this.campaignRepository = campaignRepository;
         this.projectOwnerRepository = projectOwnerRepository;
         this.notificationRepository = notificationRepository;
+        this.campaignService = campaignService;
     }
 
     @Transactional
@@ -45,6 +48,9 @@ public class CapitalPurchaseService {
                 .orElseThrow(
                         () -> new EntityNotFoundException("Campagne introuvable.")
                 );
+        if(campaign.getState() == CampaignState.FINISHED) {
+            throw new BadRequestException("Impossible de contribuer dans une campagne terminée");
+        }
         if (campaign.getType() != CampaignType.INVESTMENT) {
             throw new BadRequestException("Cette campagne n'est pas une campagne d'investissement");
         }
@@ -54,6 +60,7 @@ public class CapitalPurchaseService {
 
         var capitalPurchase = createCapitalPurchaseRequest.toCapitalPurchase();
         capitalPurchase.setContributor(contributor);
+        campaign.setState(CampaignState.FINISHED);
         capitalPurchase.setCampaign(campaign);
         sendCapitalPurchaseNotification(
                 contributorId,

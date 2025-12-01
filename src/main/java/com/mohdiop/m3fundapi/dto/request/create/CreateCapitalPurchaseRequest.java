@@ -22,7 +22,7 @@ public record CreateCapitalPurchaseRequest(
                 .payment(payment.toPayment())
                 .date(LocalDateTime.now())
                 .isValidatedByInvestor(true)
-                .isValidatedByProjectOwner(false)
+                .isValidatedByProjectOwner(true)
                 .build();
     }
 }
