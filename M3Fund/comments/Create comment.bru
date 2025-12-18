@@ -1,0 +1,15 @@
+meta {
+  name: Create comment
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/projects/1/comments
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

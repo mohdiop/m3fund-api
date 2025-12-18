@@ -1,10 +1,8 @@
 package com.mohdiop.m3fundapi.entity;
 
+import com.mohdiop.m3fundapi.dto.response.CommentResponse;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Table(name = "comments")
+@Builder
 public class Comment {
 
     @Id
@@ -40,4 +39,16 @@ public class Comment {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(nullable = false, name = "author_id ")
     private User user;
+
+    public CommentResponse toResponse() {
+        return new CommentResponse(
+                id,
+                content,
+                isResponse,
+                date,
+                isResponse ? parentComment.toResponse() : null,
+                project.getId(),
+                user.getId()
+        );
+    }
 }

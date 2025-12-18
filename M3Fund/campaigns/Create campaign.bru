@@ -5,15 +5,16 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/projects/2/campaigns
+  url: {{baseUrl}}/projects/3/campaigns
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "endAt": "2025-11-30T12:00:00",
-    "type": "DONATION",
+    "endAt": "2025-12-30T12:00:00",
+    "type": "INVESTMENT",
+    "shareOffered": 2.2,
     "targetBudget": 12000000,
     "localization": {
       "country": "Mali",

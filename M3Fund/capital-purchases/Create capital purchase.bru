@@ -5,19 +5,23 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/projects/campaigns/4/capital-purchases
+  url: {{baseUrl}}/projects/campaigns/3/capital-purchases
   body: json
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMiIsInR5cGUiOiJBQ0NFU1NfVE9LRU4iLCJyb2xlcyI6WyJST0xFX0NPTlRSSUJVVE9SIl0sImlhdCI6MTc2NDYwMjUxMiwiZXhwIjoxNzY0Njg4OTEyfQ.MaWps3i5HSBuG0BOTvdjPiWvNUewArdxB-21RQ0zESc
 }
 
 body:json {
   {
     "shareAcquired": 2.2,
     "payment": {
-      "transactionId": "12345672981234467899",
+      "transactionId": "1234567228123446183Z9",
       "type": "ORANGE_MONEY",
       "state": "SUCCESS",
-      "amount": 613953
+      "amount": 1200000
     }
   }
 }
