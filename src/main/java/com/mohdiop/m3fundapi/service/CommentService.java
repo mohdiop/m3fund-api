@@ -46,4 +46,23 @@ public class CommentService {
         comment.setUser(user);
         return commentRepository.save(comment).toResponse();
     }
+
+    public CommentResponse respondToComment(
+            Long userId,
+            Long parentId,
+            CreateCommentRequest request
+    ) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("utilisateur introuvable.")
+                );
+        var parent = commentRepository.findById(parentId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Commentaire introuvable.")
+                );
+        var comment = request.toComment();
+        comment.setUser(user);
+        comment.setProject(parent.getProject());
+        return commentRepository.save(comment).toResponse();
+    }
 }

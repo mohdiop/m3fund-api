@@ -35,4 +35,19 @@ public class CommentController {
                 )
         );
     }
+
+    @PostMapping("/comments/{parentId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<CommentResponse> respondComment(
+            @Valid @RequestBody CreateCommentRequest createCommentRequest,
+            @PathVariable Long parentId
+    ) {
+        return ResponseEntity.ok(
+                commentService.respondToComment(
+                        authenticationService.getCurrentUserId(),
+                        parentId,
+                        createCommentRequest
+                )
+        );
+    }
 }

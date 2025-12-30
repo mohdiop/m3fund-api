@@ -1,10 +1,8 @@
 package com.mohdiop.m3fundapi.entity;
 
+import com.mohdiop.m3fundapi.dto.response.MessageResponse;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "messages")
+@Builder
 public class Message {
 
     @Id
@@ -33,4 +32,13 @@ public class Message {
     @ManyToOne
     @JoinColumn(name = "discussion_id", nullable = false)
     private Discussion discussion;
+
+    public MessageResponse toResponse() {
+        return new MessageResponse(
+                id,
+                content,
+                sentAt,
+                discussion.getId()
+        );
+    }
 }
