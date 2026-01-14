@@ -1,0 +1,15 @@
+meta {
+  name: Delete my account
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/users/delete
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
